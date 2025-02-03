@@ -7,6 +7,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 	// Declare Info
 	private int timeInteger = 10;
 	private int scoreInteger = 0;
+	private int levelInteger = 0;
 
 	// Declare Static Labels 
 	private JLabel timerLabel;
@@ -17,12 +18,14 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 	private JLabel timerValue;
 	private JLabel wantedShape;
 	private JLabel scoreValue;
+	private JLabel currentLevel;
 
 	// Declare Buttons
 	private JButton playB;
 	private JButton quitB;
 
 	private Container mainContainer;
+	private Timer timer;
 
 	private JPanel mainPanel;
 	private GamePanel gamePanel;
@@ -46,11 +49,14 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		timerValue = new JLabel(String.valueOf(timeInteger));
 		wantedShape = new JLabel("?");
 		scoreValue = new JLabel(String.valueOf(scoreInteger));
+		currentLevel = new JLabel(String.valueOf(levelInteger));
 
 		// Decorate Dynamic Labels
 		timerValue.setFont(new Font("Verdana", Font.BOLD, 40));
 		wantedShape.setFont(new Font("Verdana", Font.BOLD, 50));
 		scoreValue.setFont(new Font("Verdana", Font.BOLD, 40));
+		currentLevel.setFont(new Font("Verdana", Font.BOLD, 40));
+		currentLevel.setForeground(Color.WHITE);
 
 		// Create Buttons
 		playB = new JButton ("Play");
@@ -71,12 +77,12 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		// Decorate Buttons - Border
 		playB.setBorder(BorderFactory.createCompoundBorder(
 			BorderFactory.createLineBorder(Color.WHITE, 3), // Outer Border
-			BorderFactory.createEmptyBorder(10, 50, 10, 50) // Inner Padding
+			BorderFactory.createEmptyBorder(5, 50, 5, 50) // Inner Padding
 		));
 
 		quitB.setBorder(BorderFactory.createCompoundBorder(
 			BorderFactory.createLineBorder(Color.WHITE, 3),
-			BorderFactory.createEmptyBorder(10, 50, 10, 50)
+			BorderFactory.createEmptyBorder(5, 50, 5, 50)
 		));
 
 		// Disable Button Focus
@@ -106,7 +112,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		JPanel infoPanel = new JPanel();
 		infoPanel.setPreferredSize(new Dimension(800, 100));
 		infoPanel.setLayout(new GridLayout(1, 3, 0, 0));
-		infoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		infoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
 
 		// Create Individual Panels For Each Info Component
 		JPanel timerPanel = new JPanel();
@@ -148,12 +154,18 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		// Create buttonPanel
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setBackground(Color.BLACK);
-		gridLayout = new GridLayout(1, 2,250,  0);
+		gridLayout = new GridLayout(1, 3,90,  0);
 		buttonPanel.setLayout(gridLayout);
-		buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+		// Create levelPanel
+		JPanel levelPanel = new JPanel();
+		levelPanel.add(currentLevel);
+		levelPanel.setBackground(Color.BLACK);
 
 		// Add Buttons To buttonPanel
 		buttonPanel.add (playB);
+		buttonPanel.add(levelPanel);
 		buttonPanel.add (quitB);
 
 		mainPanel.add(infoPanel);
@@ -178,8 +190,13 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
 
-		if (command.equals(playB.getText()))
+		if (command.equals(playB.getText())) {
+			playB.setEnabled(false);
+			levelInteger = levelInteger + 1;
+			currentLevel.setText(String.valueOf(levelInteger));
+			startTimerCountdown();
 			gamePanel.drawGameEntities();
+		}
 
 		if (command.equals(quitB.getText()))
 			System.exit(0);
@@ -224,4 +241,28 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 	public void mouseReleased(MouseEvent e) {
 	
 	}
+
+	// Method For Timer Countdown
+	private void startTimerCountdown() {
+        if (timer != null && timer.isRunning()) {
+            timer.stop();
+        }
+
+        timer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (timeInteger > 0) {
+                    timeInteger--;
+					if (timeInteger <= 5) {
+						timerValue.setForeground(Color.RED);
+					}
+					timerValue.setText(String.valueOf(timeInteger));
+                } else {
+                    timer.stop();
+                }
+            }
+        });
+
+        timer.start();
+    }
 }
