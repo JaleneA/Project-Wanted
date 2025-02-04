@@ -25,6 +25,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 
 	private Container mainContainer;
 	private Timer timer;
+	private boolean isTimerStopped = false;
 
 	private JPanel mainPanel;
 	private GamePanel gamePanel;
@@ -104,7 +105,6 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		gamePanel.setBackground(Color.BLACK);
 		gamePanel.setPreferredSize(new Dimension(680, 394));
 		gamePanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
-		gamePanel.createGameEntities();
 
 		// Create shapePanel
 		shapePanel = new ShapePanel();
@@ -196,17 +196,14 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		String command = e.getActionCommand();
 
 		if (command.equals(playB.getText())) {
-			// playB.setEnabled(false);
+			playB.setEnabled(false);
 			levelInteger = levelInteger + 1;
 			currentLevel.setText(String.valueOf(levelInteger));
 			startTimerCountdown();
-			gamePanel.drawGameEntities();
+			gamePanel.createGameEntities();
+			gamePanel.repaint();
 			shapePanel.pickWantedShape();
-			shapePanel.drawWantedShape();
-
-			// DEBUG
-			GamePanel.Shapes selectedShape = shapePanel.getSelectedShape();
-			System.out.println("Selected Shape: " + selectedShape);
+			shapePanel.repaint();
 		}
 
 		if (command.equals(quitB.getText()))
@@ -237,25 +234,15 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		GamePanel.Shapes selectedShape = shapePanel.getSelectedShape();
 
 		if (shape != GamePanel.Shapes.NONE) {
-			wantedIntel.setText(shape.name());
 			if (shape == selectedShape) {
-				// Time Award
-				timeInteger = timeInteger + 5;
-				timerValue.setText(String.valueOf(timeInteger));
-
-				// Score Award
-				scoreInteger = scoreInteger + 100;
-				scoreValue.setText(String.valueOf(scoreInteger));
+				continueGame();
+				endGame();
 			}
 			else {
-				// Time Consequence
+				// Time Consequence/.
 				timeInteger = timeInteger - 10;
 				timerValue.setText(String.valueOf(timeInteger));
 			}
-
-			shapePanel.panelEraser();
-		} else {
-			wantedIntel.setText("Wanted");
 		}
 	}
 
@@ -279,14 +266,14 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 	
 	}
 
-	// Method For Timer Countdown
+	// Method To Start Timer Countdown
 	private void startTimerCountdown() {
         if (timer != null && timer.isRunning()) {
             timer.stop();
         }
 
         timer = new Timer(1000, (ActionEvent e) -> {
-            if (timeInteger > 0) {
+            if (timeInteger > 0 && !isTimerStopped) {
                 timeInteger--;
                 if (timeInteger <= 5) {
                     timerValue.setForeground(Color.RED);
@@ -299,4 +286,45 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 
         timer.start();
     }
+
+	// Method To Stop Timer Countdown
+	private void stopTimer() {
+		isTimerStopped = true;
+		if (timer != null) {
+			timer.stop();
+		}
+	}
+
+	// Method To End Game
+	private void endGame() {
+		if (levelInteger == 11) {
+			// Clear gamePamel
+			shapePanel.panelEraser();
+			gamePanel.panelEraser();
+			wantedIntel.setText("yay :D");
+			levelInteger = levelInteger - 1;
+			currentLevel.setText(String.valueOf(levelInteger));
+			stopTimer();
+		}
+	}
+
+	// Method To Continue Game
+	private void continueGame() {
+		// Time Award
+		timeInteger = timeInteger + 5;
+		timerValue.setText(String.valueOf(timeInteger));
+
+		// Score Award
+		scoreInteger = scoreInteger + 100;
+		scoreValue.setText(String.valueOf(scoreInteger));
+
+		// Next Level
+		if (levelInteger <= 10) {
+			levelInteger = levelInteger + 1;
+			currentLevel.setText(String.valueOf(levelInteger));
+		}
+		shapePanel.panelEraser();
+		shapePanel.pickWantedShape();
+		shapePanel.drawWantedShape();
+	}
 }

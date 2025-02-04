@@ -38,18 +38,14 @@ public class Triangle {
     }
 
     // Draw Triangle
-    public void draw() {
-        Graphics g = panel.getGraphics();
+    public void draw(Graphics g) {
         g.setColor(Color.GREEN);
-
         triangle = new Polygon(
             new int[] {x, x + b, x + b / 2},
             new int[] {y + h, y + h, y},
             3
         );
-
         g.fillPolygon(triangle);
-        g.dispose();
     }
 
     // Is On Triangle

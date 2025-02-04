@@ -1,3 +1,4 @@
+import java.awt.Graphics;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel {
@@ -32,31 +33,31 @@ public class GamePanel extends JPanel {
       circle = new Circle(this, 320, 50);
    }
 
-   public void drawGameEntities() {
+   public void drawGameEntities(Graphics g) {
 
       // Square
       if (square != null) {
-         square.draw();
+         square.draw(g);
       }
 
       // Diamond
       if (diamond != null) {
-         diamond.draw();
+         diamond.draw(g);
       }
 
       // Triangle
       if (triangle != null) {
-         triangle.draw();
+         triangle.draw(g);
       }
 
       // Circle
       if (circle != null) {
-         circle.draw();
+         circle.draw(g);
       }
 
-       if (bat != null) {
-         bat.draw();
-       }
+      //  if (bat != null) {
+      //    bat.draw(g);
+      //  }
    }
 
    public void updateGameEntities(int direction) {
@@ -94,5 +95,22 @@ public class GamePanel extends JPanel {
          return Shapes.TRIANGLE;
 
       return Shapes.NONE;
+   }
+
+   @Override
+   protected void paintComponent(Graphics g) {
+      super.paintComponent(g);
+      g.setColor(getBackground());
+      g.fillRect(0, 0, getWidth(), getHeight());
+
+      drawGameEntities(g);
+   }
+
+   public void panelEraser() {
+      square = null;
+      diamond = null;
+      triangle = null;
+      circle = null;
+      repaint();
    }
 }

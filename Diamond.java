@@ -40,8 +40,7 @@ public class Diamond {
    }
 
    // Draw Diamond
-   public void draw() {
-      Graphics g = panel.getGraphics();
+   public void draw(Graphics g) {
       Graphics2D g2 = (Graphics2D) g;
       g2.setColor(Color.YELLOW);
 
@@ -53,7 +52,6 @@ public class Diamond {
 
       diamond = new Polygon(xPoints, yPoints, 4);
       g2.fill(diamond);
-      g.dispose();
    }
 
    // Is On Diamond

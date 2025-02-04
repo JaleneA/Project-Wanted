@@ -36,6 +36,7 @@ public class ShapePanel extends JPanel {
    }
 
    public void pickWantedShape() {
+
       // Random Selection
       Random rand = new Random();
       int randomIndex = rand.nextInt(GamePanel.Shapes.values().length - 1);
@@ -73,26 +74,7 @@ public class ShapePanel extends JPanel {
    }
 
    public void drawWantedShape() {
-
-      // Square
-      if (square != null) {
-         square.draw();
-      }
-
-      // Diamond
-      if (diamond != null) {
-         diamond.draw();
-      }
-
-      // Triangle
-      if (triangle != null) {
-         triangle.draw();
-      }
-
-      // Circle
-      if (circle != null) {
-         circle.draw();
-      }
+      repaint();
    }
 
    public GamePanel.Shapes getSelectedShape() {
@@ -104,6 +86,11 @@ public class ShapePanel extends JPanel {
       super.paintComponent(g);
       g.setColor(getBackground());
       g.fillRect(0, 0, getWidth(), getHeight());
+
+      if (square != null) square.draw(g);
+      if (diamond != null) diamond.draw(g);
+      if (triangle != null) triangle.draw(g);
+      if (circle != null) circle.draw(g);
    }
 
    public void panelEraser() {

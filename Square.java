@@ -38,14 +38,11 @@ public class Square {
    }
 
    // Draw Square
-   public void draw () {
-      Graphics g = panel.getGraphics ();
+   public void draw (Graphics g) {
       Graphics2D g2 = (Graphics2D) g;
-
       square = new Rectangle2D.Double(x, y, w, h);
       g2.setColor(Color.RED);
       g2.fill(square);
-      g.dispose();
    }
 
    // Is On Square

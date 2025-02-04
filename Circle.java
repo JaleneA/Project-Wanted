@@ -38,13 +38,11 @@ public class Circle extends Thread {
    }
 
    // Draw Circle
-   public void draw () {
-      Graphics g = panel.getGraphics ();
+   public void draw (Graphics g) {
       Graphics2D g2 = (Graphics2D) g;
       circle = new Ellipse2D.Double(x, y, w, h);
       g2.setColor(Color.BLUE); 
       g2.fill(circle);
-      g.dispose();
    }
 
    // Is On Circle
