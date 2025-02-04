@@ -11,6 +11,10 @@ public class GamePanel extends JPanel {
    Triangle triangle;
    Circle circle;
 
+   public enum Shapes {
+      SQUARE, DIAMOND, CIRCLE, TRIANGLE, NONE
+   }
+
    public GamePanel() {
       square = null;
       diamond = null;
@@ -26,9 +30,6 @@ public class GamePanel extends JPanel {
       diamond = new Diamond(this, 120, 50);
       triangle = new Triangle(this, 220, 50);
       circle = new Circle(this, 320, 50);
-
-   //  bat = new Bat (this, 50, 350); 
-   //  alien = new Alien (this, 200, 10); 
    }
 
    public void drawGameEntities() {
@@ -72,10 +73,26 @@ public class GamePanel extends JPanel {
       }
    }
 
-   public boolean isOnBat (int x, int y) {
-      if (bat != null)
-         return bat.isOnBat(x, y);
-      else
-         return false;
+   public Shapes isOnShape (int x, int y) {
+
+      // Square
+      if (square != null && square.isOnSquare(x, y)) {
+         return Shapes.SQUARE ;
+      }
+
+      // Diamond
+      if (diamond != null && diamond.isOnDiamond(x, y)) {
+         return Shapes.DIAMOND;
+      }
+
+      // Circle
+      if (circle != null && circle.isOnCircle(x, y))
+         return Shapes.CIRCLE;
+
+      // Triangle
+      if (triangle != null && triangle.isOnTriangle(x, y))
+         return Shapes.TRIANGLE;
+
+      return Shapes.NONE;
    }
 }

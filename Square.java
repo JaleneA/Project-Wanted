@@ -27,6 +27,7 @@ public class Square {
       panel = p;
       dimension = panel.getSize();
       backgroundColour = panel.getBackground ();
+
       x = xPos;
       y = yPos;
 
@@ -37,6 +38,7 @@ public class Square {
       height = 50;
    }
 
+   // Draw Square
    public void draw () {
       Graphics g = panel.getGraphics ();
       Graphics2D g2 = (Graphics2D) g;
@@ -44,6 +46,24 @@ public class Square {
       square = new Rectangle2D.Double(x, y, width, height);
       g2.setColor(Color.RED);
       g2.fill(square);
+      g.dispose();
+   }
+
+   // Is On Square
+   public boolean isOnSquare (int x, int y) {
+      if (square == null)
+            return false;
+      return square.contains(x, y);
+   }
+
+   // Erase Square
+   public void erase() {
+      Graphics g = panel.getGraphics ();
+      Graphics2D g2 = (Graphics2D) g;
+
+      g2.setColor (backgroundColour);
+      g2.fill (new Rectangle2D.Double (x, y, width, height));
+
       g.dispose();
    }
 }

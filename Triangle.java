@@ -17,6 +17,8 @@ public class Triangle {
    private int dx;
    private int dy;
 
+   Polygon triangle;
+
    private Color backgroundColour;
    private Dimension dimension;
 
@@ -35,11 +37,12 @@ public class Triangle {
         height = 50;
     }
 
+    // Draw Triangle
     public void draw() {
         Graphics g = panel.getGraphics();
         g.setColor(Color.GREEN);
 
-        Polygon triangle = new Polygon(
+        triangle = new Polygon(
             new int[] {x, x + base, x + base / 2},
             new int[] {y + height, y + height, y},
             3
@@ -48,4 +51,24 @@ public class Triangle {
         g.fillPolygon(triangle);
         g.dispose();
     }
+
+    // Is On Triangle
+   public boolean isOnTriangle (int x, int y) {
+    if (triangle == null)
+        return false;
+
+    return triangle.contains(x, y);
+   }
+
+    // Erase Triangle - Square Code
+    // public void erase () {
+    //     Graphics g = panel.getGraphics ();
+    //     Graphics2D g2 = (Graphics2D) g;
+
+    //     g2.setColor (backgroundColour);
+    //     g2.fill (new Rectangle2D.Double (x, y, width, height));
+
+    //     g.dispose();
+    // }
+
 }

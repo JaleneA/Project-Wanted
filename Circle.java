@@ -32,6 +32,7 @@ public class Circle extends Thread {
       dy = 10;
    }
 
+   // Draw Circle
    public void draw () {
       Graphics g = panel.getGraphics ();
       Graphics2D g2 = (Graphics2D) g;
@@ -39,5 +40,13 @@ public class Circle extends Thread {
       g2.setColor(Color.BLUE); 
       g2.fill(circle);
       g.dispose();
+   }
+
+   // Is On Circle
+   public boolean isOnCircle (int x, int y) {
+      if (circle == null)
+            return false;
+
+      return circle.contains(x, y);
    }
 }

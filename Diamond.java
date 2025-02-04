@@ -2,7 +2,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.Polygon;
 import javax.swing.JPanel;
 
 public class Diamond {
@@ -18,7 +18,7 @@ public class Diamond {
    private int dx;
    private int dy;
 
-   private Rectangle2D.Double diamond;
+   private Polygon diamond;
 
    private double angle = Math.toRadians(45);
 
@@ -35,19 +35,31 @@ public class Diamond {
       dx = 10;
       dy = 0;
 
-      width = 40;
-      height = 40;
+      width = 50;
+      height = 50;
    }
 
-   public void draw () {
-      Graphics g = panel.getGraphics ();
+   // Draw Diamond
+   public void draw() {
+      Graphics g = panel.getGraphics();
       Graphics2D g2 = (Graphics2D) g;
       g2.setColor(Color.YELLOW);
-      g2.translate(x + width / 2, y + height / 2);
-      g2.rotate(angle);
-      diamond = new Rectangle2D.Double(-width / 2, -height / 2, width, height);
+
+      double centerX = x + width / 2;
+      double centerY = y + height / 2;
+
+      int[] xPoints = { (int) centerX, (int) (centerX + width / 2), (int) centerX, (int) (centerX - width / 2) };
+      int[] yPoints = { (int) (centerY - height / 2), (int) centerY, (int) (centerY + height / 2), (int) centerY };
+
+      diamond = new Polygon(xPoints, yPoints, 4);
       g2.fill(diamond);
-      g2.setTransform(g2.getTransform());
       g.dispose();
+   }
+
+   // Is On Diamond
+   public boolean isOnDiamond (int x, int y) {
+      if (diamond == null)
+            return false;
+      return diamond.contains(x, y);
    }
 }

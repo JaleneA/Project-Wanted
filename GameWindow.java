@@ -16,7 +16,6 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 
 	// Declare Dynamic Labels
 	private JLabel timerValue;
-	private JLabel wantedShape;
 	private JLabel scoreValue;
 	private JLabel currentLevel;
 
@@ -29,6 +28,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 
 	private JPanel mainPanel;
 	private GamePanel gamePanel;
+	private ShapePanel shapePanel;
 
 	public GameWindow() {
 
@@ -37,7 +37,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 
 		// Create Static Labels
 		timerLabel = new JLabel ("Timer");
-		wantedIntel = new JLabel("Hates Circles");
+		wantedIntel = new JLabel("Wanted");
 		scoreLabel = new JLabel("Score");
 
 		// Decorate Static Labels
@@ -47,13 +47,11 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 
 		// Create Dynamic Labels
 		timerValue = new JLabel(String.valueOf(timeInteger));
-		wantedShape = new JLabel("?");
 		scoreValue = new JLabel(String.valueOf(scoreInteger));
 		currentLevel = new JLabel(String.valueOf(levelInteger));
 
 		// Decorate Dynamic Labels
 		timerValue.setFont(new Font("Verdana", Font.BOLD, 40));
-		wantedShape.setFont(new Font("Verdana", Font.BOLD, 50));
 		scoreValue.setFont(new Font("Verdana", Font.BOLD, 40));
 		currentLevel.setFont(new Font("Verdana", Font.BOLD, 40));
 		currentLevel.setForeground(Color.WHITE);
@@ -108,6 +106,12 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		gamePanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
 		gamePanel.createGameEntities();
 
+		// Create shapePanel
+		shapePanel = new ShapePanel();
+		shapePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		shapePanel.setBackground(Color.WHITE);
+		shapePanel.setPreferredSize(new Dimension(100, 100));
+
 		// Create infoPanel
 		JPanel infoPanel = new JPanel();
 		infoPanel.setPreferredSize(new Dimension(800, 100));
@@ -126,14 +130,13 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		timerPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 30, 0));
 
 		JPanel wantedPanel = new JPanel();
-		wantedPanel.add(wantedIntel);
-		wantedPanel.add(wantedShape);
-		wantedShape.setBackground(Color.WHITE);
-		wantedPanel.setBackground(Color.WHITE);
-		wantedIntel.setAlignmentX(Component.CENTER_ALIGNMENT); 
-		wantedShape.setAlignmentX(Component.CENTER_ALIGNMENT); 
 		wantedPanel.setLayout(new BoxLayout(wantedPanel, BoxLayout.Y_AXIS));
-		wantedPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 30, 0));
+		wantedPanel.setBackground(Color.WHITE);
+		wantedPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+		wantedPanel.add(wantedIntel);
+		wantedPanel.add(shapePanel);
+		wantedIntel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		shapePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		JPanel scorePanel = new JPanel();
 		scorePanel.add(scoreValue);
@@ -191,11 +194,17 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		String command = e.getActionCommand();
 
 		if (command.equals(playB.getText())) {
-			playB.setEnabled(false);
+			// playB.setEnabled(false);
 			levelInteger = levelInteger + 1;
 			currentLevel.setText(String.valueOf(levelInteger));
 			startTimerCountdown();
 			gamePanel.drawGameEntities();
+			shapePanel.pickWantedShape();
+			shapePanel.drawWantedShape();
+
+			// DEBUG
+			GamePanel.Shapes selectedShape = shapePanel.getSelectedShape();
+			System.out.println("Selected Shape: " + selectedShape);
 		}
 
 		if (command.equals(quitB.getText()))
@@ -219,7 +228,33 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		int x = e.getX();
+		int y = e.getY();
 
+		GamePanel.Shapes shape = gamePanel.isOnShape(x, y);
+		GamePanel.Shapes selectedShape = shapePanel.getSelectedShape();
+
+		if (shape != GamePanel.Shapes.NONE) {
+			wantedIntel.setText(shape.name());
+			if (shape == selectedShape) {
+				// Time Award
+				timeInteger = timeInteger + 5;
+				timerValue.setText(String.valueOf(timeInteger));
+
+				// Score Award
+				scoreInteger = scoreInteger + 100;
+				scoreValue.setText(String.valueOf(scoreInteger));
+			}
+			else {
+				// Time Consequence
+				timeInteger = timeInteger - 10;
+				timerValue.setText(String.valueOf(timeInteger));
+			}
+
+			shapePanel.panelEraser();
+		} else {
+			wantedIntel.setText("Wanted");
+		}
 	}
 
 	@Override
@@ -248,18 +283,15 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
             timer.stop();
         }
 
-        timer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (timeInteger > 0) {
-                    timeInteger--;
-					if (timeInteger <= 5) {
-						timerValue.setForeground(Color.RED);
-					}
-					timerValue.setText(String.valueOf(timeInteger));
-                } else {
-                    timer.stop();
+        timer = new Timer(1000, (ActionEvent e) -> {
+            if (timeInteger > 0) {
+                timeInteger--;
+                if (timeInteger <= 5) {
+                    timerValue.setForeground(Color.RED);
                 }
+                timerValue.setText(String.valueOf(timeInteger));
+            } else {
+                timer.stop();
             }
         });
 
