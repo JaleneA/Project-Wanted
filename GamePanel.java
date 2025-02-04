@@ -1,10 +1,10 @@
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel {
-
-   Bat bat;
-   Alien alien;
 
    // Shapes
    Square square;
@@ -12,90 +12,86 @@ public class GamePanel extends JPanel {
    Triangle triangle;
    Circle circle;
 
+   // Dummy Shapes
+   private Square dummySquare;
+   private Diamond dummyDiamond;
+   private Triangle dummyTriangle;
+   private Circle dummyCircle;
+
+   // Info
+   private Dimension dimension;
+   private int currentLevel;
+   private List<Object> shapesList = new ArrayList<>();
+
    public enum Shapes {
       SQUARE, DIAMOND, CIRCLE, TRIANGLE, NONE
    }
 
    public GamePanel() {
+      // Shapes
       square = null;
       diamond = null;
       triangle = null;
       circle = null;
 
-      bat = null;
-      alien = null;
+      // Dummy Shapes
+      dummySquare = null;
+      dummyDiamond = null;
+      dummyTriangle = null;
+      dummyCircle = null;
    }
 
    public void createGameEntities() {
-      square = new Square(this, 20, 50);
-      diamond = new Diamond(this, 120, 50);
-      triangle = new Triangle(this, 220, 50);
-      circle = new Circle(this, 320, 50);
-   }
+      switch (currentLevel) {
+         case 1 -> levelOne();
+         case 2 -> levelTwo();
+         case 3 -> levelOne();
+         case 4 -> levelTwo();
+         case 5 -> levelOne();
+         case 6 -> levelTwo();
+         case 7 -> levelOne();
+         case 8 -> levelTwo();
+         case 9 -> levelOne();
+         case 10 -> levelTwo();
+         default -> System.out.println("Huh- You're Not Supposed To Be Here! Level: " + currentLevel);
+     }
+ }
 
    public void drawGameEntities(Graphics g) {
-
-      // Square
-      if (square != null) {
-         square.draw(g);
-      }
-
-      // Diamond
-      if (diamond != null) {
-         diamond.draw(g);
-      }
-
-      // Triangle
-      if (triangle != null) {
-         triangle.draw(g);
-      }
-
-      // Circle
-      if (circle != null) {
-         circle.draw(g);
-      }
-
-      //  if (bat != null) {
-      //    bat.draw(g);
-      //  }
+      for (Object shape : shapesList) {
+         if (shape instanceof Square) {
+             ((Square) shape).draw(g);
+         } else if (shape instanceof Diamond) {
+             ((Diamond) shape).draw(g);
+         } else if (shape instanceof Triangle) {
+             ((Triangle) shape).draw(g);
+         } else if (shape instanceof Circle) {
+             ((Circle) shape).draw(g);
+         }
+     }
    }
 
    public void updateGameEntities(int direction) {
-      if (bat == null)
-         return;
-
-      bat.erase();
-      bat.move(direction);
+     
    }
 
-   public void dropAlien() {
-      if (alien != null) {
-         alien.start();
+   public Shapes isOnShape(int x, int y) {
+      for (Object shape : shapesList) {
+          if (shape instanceof Square && ((Square) shape).isOnSquare(x, y)) {
+              return Shapes.SQUARE;
+          }
+          if (shape instanceof Diamond && ((Diamond) shape).isOnDiamond(x, y)) {
+              return Shapes.DIAMOND;
+          }
+          if (shape instanceof Circle && ((Circle) shape).isOnCircle(x, y)) {
+              return Shapes.CIRCLE;
+          }
+          if (shape instanceof Triangle && ((Triangle) shape).isOnTriangle(x, y)) {
+              return Shapes.TRIANGLE;
+          }
       }
-   }
-
-   public Shapes isOnShape (int x, int y) {
-
-      // Square
-      if (square != null && square.isOnSquare(x, y)) {
-         return Shapes.SQUARE ;
-      }
-
-      // Diamond
-      if (diamond != null && diamond.isOnDiamond(x, y)) {
-         return Shapes.DIAMOND;
-      }
-
-      // Circle
-      if (circle != null && circle.isOnCircle(x, y))
-         return Shapes.CIRCLE;
-
-      // Triangle
-      if (triangle != null && triangle.isOnTriangle(x, y))
-         return Shapes.TRIANGLE;
-
       return Shapes.NONE;
-   }
+  }
 
    @Override
    protected void paintComponent(Graphics g) {
@@ -107,10 +103,115 @@ public class GamePanel extends JPanel {
    }
 
    public void panelEraser() {
-      square = null;
-      diamond = null;
-      triangle = null;
-      circle = null;
+      shapesList.clear();
       repaint();
+   }
+
+   private void levelOne() {
+
+      shapesList.clear();
+
+      // Dimension Sizes
+      dimension = this.getSize();
+      int panelW = dimension.width;
+      int panelH = dimension.height;
+
+      // Shape Sizes
+      dummySquare = new Square(this,0, 0);
+      int squareW = dummySquare.getW();
+      int squareH = dummySquare.getH();
+
+      dummyDiamond = new Diamond(this, 0, 0);
+      int diamondW = dummyDiamond.getW();
+      int diamondH = dummyDiamond.getH();
+
+      dummyTriangle = new Triangle(this, 0, 0);
+      int triangleB = dummyTriangle.getB();
+      int triangleH = dummyTriangle.getH();
+
+      dummyCircle = new Circle(this, 0, 0);
+      int circleW = dummyCircle.getW();
+      int circleH = dummyCircle.getH();
+
+      // Positioning Offset
+      int offCenter = 50;
+
+      createShape(Shapes.SQUARE, (panelW / 2) - (squareW / 2) + offCenter, (panelH / 2) - (squareH / 2) + offCenter);
+      createShape(Shapes.DIAMOND, (panelW / 2) - (diamondW / 2) + offCenter, (panelH / 2) - (diamondH / 2) - offCenter);
+      createShape(Shapes.TRIANGLE, (panelW / 2) - (triangleB / 2) - offCenter, (panelH / 2) - (triangleH / 2) - offCenter);
+      createShape(Shapes.CIRCLE, (panelW / 2) - (circleW / 2) - offCenter, (panelH / 2) - (circleH / 2) + offCenter);
+
+      repaint();
+   }
+
+   private void levelTwo() {
+
+      shapesList.clear();
+
+      // Dimension Sizes
+      dimension = this.getSize();
+      int panelW = dimension.width;
+      int panelH = dimension.height;
+  
+      // Shape Sizes
+      dummySquare = new Square(this, 0, 0);
+      int shapeW = dummySquare.getW();
+  
+      // Define Grid Size
+      int cellPadding = 5;
+      int cols = (panelW - cellPadding) / (shapeW + cellPadding);
+      int rows = (panelH - cellPadding) / (shapeW + cellPadding);
+
+      Shapes[] shapeTypes = {Shapes.SQUARE, Shapes.DIAMOND, Shapes.TRIANGLE, Shapes.CIRCLE};
+      Shapes wantedShapeType = ShapePanel.getSelectedShape();
+      
+      List<Shapes> unwantedShapes = new ArrayList<>();
+      for (Shapes shape : shapeTypes) {
+         if (shape != wantedShapeType) {
+            unwantedShapes.add(shape);
+         }
+      }
+
+      int oddRow = (int) (Math.random() * rows);
+      int oddCol = (int) (Math.random() * cols);
+
+      for (int row = 0; row < rows; row++) {
+          for (int col = 0; col < cols; col++) {
+              int x = col * (shapeW + cellPadding) + cellPadding;
+              int y = row * (shapeW + cellPadding) + cellPadding;
+              
+              if (row == oddRow && col == oddCol) {
+                 createShape(wantedShapeType, x, y);
+              } else {
+                  Shapes randomUnwantedShape = unwantedShapes.get((int) (Math.random() * unwantedShapes.size()));
+                  createShape(randomUnwantedShape, x, y);
+              }
+          }
+      }
+      repaint();
+  }
+
+  // Helper Method
+   private void createShape(Shapes type, int x, int y) {
+
+      if (type == null) {
+         throw new IllegalArgumentException("Shape type cannot be null");
+     }
+
+      Object shape = switch (type) {
+            case SQUARE -> new Square(this, x, y);
+            case DIAMOND -> new Diamond(this, x, y);
+            case TRIANGLE -> new Triangle(this, x, y);
+            case CIRCLE -> new Circle(this, x, y);
+            default -> throw new IllegalArgumentException("Unexpected value: " + type);
+      };
+
+      if (shape != null) {
+         shapesList.add(shape);
+      }
+   }
+
+   public void setLevel(int level) {
+      this.currentLevel = level;
    }
 }

@@ -19,7 +19,7 @@ public class ShapePanel extends JPanel {
 
    // Info
    private Dimension dimension;
-   private GamePanel.Shapes selectedShape;
+   private static GamePanel.Shapes selectedShape;
 
    public ShapePanel() {
       // Shapes
@@ -77,7 +77,10 @@ public class ShapePanel extends JPanel {
       repaint();
    }
 
-   public GamePanel.Shapes getSelectedShape() {
+   public static void setWantedShape(GamePanel.Shapes shapeSelected) {
+      selectedShape = shapeSelected;
+   }
+   public static GamePanel.Shapes getSelectedShape() {
       return selectedShape;
   }
 

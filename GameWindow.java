@@ -103,7 +103,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		// Create gamePanel
 		gamePanel = new GamePanel();
 		gamePanel.setBackground(Color.BLACK);
-		gamePanel.setPreferredSize(new Dimension(680, 394));
+		gamePanel.setPreferredSize(new Dimension(665, 390));
 		gamePanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
 
 		// Create shapePanel
@@ -198,11 +198,12 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		if (command.equals(playB.getText())) {
 			playB.setEnabled(false);
 			levelInteger = levelInteger + 1;
+			gamePanel.setLevel(levelInteger);
 			currentLevel.setText(String.valueOf(levelInteger));
 			startTimerCountdown();
+			shapePanel.pickWantedShape();
 			gamePanel.createGameEntities();
 			gamePanel.repaint();
-			shapePanel.pickWantedShape();
 			shapePanel.repaint();
 		}
 
@@ -210,21 +211,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 			System.exit(0);
 	}
 
-	// KeyListener Interface
-	// public void keyPressed(KeyEvent e) {
-
-	// }
-
-	// public void keyReleased(KeyEvent e) {
-
-	// }
-
-	// public void keyTyped(KeyEvent e) {
-
-	// }
-
 	// MouseListener Interface
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		int x = e.getX();
@@ -272,7 +259,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
             timer.stop();
         }
 
-        timer = new Timer(1000, (ActionEvent e) -> {
+        timer = new Timer(800, (ActionEvent e) -> {
             if (timeInteger > 0 && !isTimerStopped) {
                 timeInteger--;
                 if (timeInteger <= 5) {
@@ -321,10 +308,13 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		// Next Level
 		if (levelInteger <= 10) {
 			levelInteger = levelInteger + 1;
+			gamePanel.setLevel(levelInteger);
 			currentLevel.setText(String.valueOf(levelInteger));
 		}
 		shapePanel.panelEraser();
 		shapePanel.pickWantedShape();
 		shapePanel.drawWantedShape();
+		gamePanel.panelEraser();
+		gamePanel.createGameEntities();
 	}
 }
