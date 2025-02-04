@@ -110,7 +110,6 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		shapePanel = new ShapePanel();
 		shapePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		shapePanel.setBackground(Color.WHITE);
-		shapePanel.setPreferredSize(new Dimension(100, 100));
 
 		// Create infoPanel
 		JPanel infoPanel = new JPanel();
@@ -129,6 +128,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.Y_AXIS));
 		timerPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 30, 0));
 
+		// create wantedPanel
 		JPanel wantedPanel = new JPanel();
 		wantedPanel.setLayout(new BoxLayout(wantedPanel, BoxLayout.Y_AXIS));
 		wantedPanel.setBackground(Color.WHITE);
@@ -138,6 +138,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		wantedIntel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		shapePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+		// create ScorePanel
 		JPanel scorePanel = new JPanel();
 		scorePanel.add(scoreValue);
 		scorePanel.add(scoreLabel);
@@ -148,6 +149,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		scorePanel.setLayout(new BoxLayout(scorePanel, BoxLayout.Y_AXIS));
 		scorePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 30, 0));
 
+		//create infoPanel
 		infoPanel.add(timerPanel);
 		infoPanel.add(wantedPanel);
 		infoPanel.add(scorePanel);

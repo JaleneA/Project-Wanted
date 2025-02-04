@@ -11,8 +11,8 @@ public class Triangle {
    private int x;
    private int y;
 
-   private int base;
-   private int height;
+   private int b;
+   private int h;
 
    private int dx;
    private int dy;
@@ -33,8 +33,8 @@ public class Triangle {
         dx = 0;
         dy = 10;
 
-        base = 50;
-        height = 50;
+        b = 50;
+        h = 50;
     }
 
     // Draw Triangle
@@ -43,8 +43,8 @@ public class Triangle {
         g.setColor(Color.GREEN);
 
         triangle = new Polygon(
-            new int[] {x, x + base, x + base / 2},
-            new int[] {y + height, y + height, y},
+            new int[] {x, x + b, x + b / 2},
+            new int[] {y + h, y + h, y},
             3
         );
 
@@ -70,5 +70,13 @@ public class Triangle {
 
     //     g.dispose();
     // }
+
+    public int getB() {
+        return b;
+    }
+
+    public int getH() {
+        return h;
+    }
 
 }

@@ -11,6 +11,8 @@ public class Circle extends Thread {
 
    private int x;
    private int y;
+   private int w;
+   private int h;
 
    Ellipse2D.Double circle;
 
@@ -28,6 +30,9 @@ public class Circle extends Thread {
       x = xPos;
       y = yPos;
 
+      w = 50;
+      h = 50; 
+
       dx = 0;
       dy = 10;
    }
@@ -36,7 +41,7 @@ public class Circle extends Thread {
    public void draw () {
       Graphics g = panel.getGraphics ();
       Graphics2D g2 = (Graphics2D) g;
-      circle = new Ellipse2D.Double(x, y, 50, 50);
+      circle = new Ellipse2D.Double(x, y, w, h);
       g2.setColor(Color.BLUE); 
       g2.fill(circle);
       g.dispose();
@@ -49,4 +54,12 @@ public class Circle extends Thread {
 
       return circle.contains(x, y);
    }
+
+    public int getW() {
+        return w;
+    }
+
+    public int getH() {
+        return h;
+    }
 }

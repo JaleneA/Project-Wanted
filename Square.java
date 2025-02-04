@@ -11,9 +11,8 @@ public class Square {
 
    private int x;
    private int y;
-
-   private int width;
-   private int height;
+   private int w;
+   private int h;
 
    private int dx;
    private int dy;
@@ -34,8 +33,8 @@ public class Square {
       dx = 10;
       dy = 0;
 
-      width = 50;
-      height = 50;
+      w = 50;
+      h = 50;
    }
 
    // Draw Square
@@ -43,7 +42,7 @@ public class Square {
       Graphics g = panel.getGraphics ();
       Graphics2D g2 = (Graphics2D) g;
 
-      square = new Rectangle2D.Double(x, y, width, height);
+      square = new Rectangle2D.Double(x, y, w, h);
       g2.setColor(Color.RED);
       g2.fill(square);
       g.dispose();
@@ -62,8 +61,16 @@ public class Square {
       Graphics2D g2 = (Graphics2D) g;
 
       g2.setColor (backgroundColour);
-      g2.fill (new Rectangle2D.Double (x, y, width, height));
+      g2.fill (new Rectangle2D.Double (x, y, w, h));
 
       g.dispose();
    }
+
+    public int getW() {
+        return w;
+    }
+
+    public int getH() {
+        return h;
+    }
 }

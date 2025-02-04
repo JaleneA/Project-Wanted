@@ -12,8 +12,8 @@ public class Diamond {
    private int x;
    private int y;
 
-   private int width;
-   private int height;
+   private int w;
+   private int h;
 
    private int dx;
    private int dy;
@@ -35,8 +35,8 @@ public class Diamond {
       dx = 10;
       dy = 0;
 
-      width = 50;
-      height = 50;
+      w = 50;
+      h = 50;
    }
 
    // Draw Diamond
@@ -45,11 +45,11 @@ public class Diamond {
       Graphics2D g2 = (Graphics2D) g;
       g2.setColor(Color.YELLOW);
 
-      double centerX = x + width / 2;
-      double centerY = y + height / 2;
+      double centerX = x + w / 2;
+      double centerY = y + h / 2;
 
-      int[] xPoints = { (int) centerX, (int) (centerX + width / 2), (int) centerX, (int) (centerX - width / 2) };
-      int[] yPoints = { (int) (centerY - height / 2), (int) centerY, (int) (centerY + height / 2), (int) centerY };
+      int[] xPoints = { (int) centerX, (int) (centerX + w / 2), (int) centerX, (int) (centerX - w / 2) };
+      int[] yPoints = { (int) (centerY - h / 2), (int) centerY, (int) (centerY + h / 2), (int) centerY };
 
       diamond = new Polygon(xPoints, yPoints, 4);
       g2.fill(diamond);
@@ -62,4 +62,12 @@ public class Diamond {
             return false;
       return diamond.contains(x, y);
    }
+
+    public int getW() {
+        return w;
+    }
+
+    public int getH() {
+        return h;
+    }
 }

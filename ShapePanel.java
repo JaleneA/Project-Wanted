@@ -11,26 +11,64 @@ public class ShapePanel extends JPanel {
    private Triangle triangle;
    private Circle circle;
 
+   // Dummy Shapes
+   private Square dummySquare;
+   private Diamond dummyDiamond;
+   private Triangle dummyTriangle;
+   private Circle dummyCircle;
+
+   // Info
    private Dimension dimension;
    private GamePanel.Shapes selectedShape;
 
    public ShapePanel() {
+      // Shapes
       square = null;
       diamond = null;
       triangle = null;
       circle = null;
+
+      // Dummy Shapes
+      dummySquare = null;
+      dummyDiamond = null;
+      dummyTriangle = null;
+      dummyCircle = null;
    }
 
    public void pickWantedShape() {
+      // Random Selection
       Random rand = new Random();
       int randomIndex = rand.nextInt(GamePanel.Shapes.values().length - 1);
       selectedShape = GamePanel.Shapes.values()[randomIndex];
 
+      // Dimension Sizes
+      dimension = this.getSize();
+      int panelW = dimension.width;
+      int panelH = dimension.height;
+
+      // Shape Sizes
+      dummySquare = new Square(this,0, 0);
+      int squareW = dummySquare.getW();
+      int squareH = dummySquare.getH();
+
+      dummyDiamond = new Diamond(this, 0, 0);
+      int diamondW = dummyDiamond.getW();
+      int diamondH = dummyDiamond.getH();
+
+      dummyTriangle = new Triangle(this, 0, 0);
+      int triangleB = dummyTriangle.getB();
+      int triangleH = dummyTriangle.getH();
+
+      dummyCircle = new Circle(this, 0, 0);
+      int circleW = dummyCircle.getW();
+      int circleH = dummyCircle.getH();
+
+      // Selection
       switch (selectedShape) {
-         case SQUARE -> square = new Square(this, 0, 0);
-         case DIAMOND -> diamond = new Diamond(this, 0, 0);
-         case TRIANGLE -> triangle = new Triangle(this, 0, 0);
-         case CIRCLE -> circle = new Circle(this, 0, 0);
+         case SQUARE -> square = new Square(this, (panelW / 2) - (squareW / 2), (panelH / 2) - (squareH / 2));
+         case DIAMOND -> diamond = new Diamond(this, (panelW / 2) - (diamondW / 2), (panelH / 2) - (diamondH / 2));
+         case TRIANGLE -> triangle = new Triangle(this, (panelW / 2) - (triangleB / 2), (panelH / 2) - (triangleH / 2));
+         case CIRCLE -> circle = new Circle(this, (panelW / 2) - (circleW / 2), (panelH / 2) - (circleH / 2));
       }
    }
 
