@@ -32,10 +32,6 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 	private ShapePanel shapePanel;
 
 	public GameWindow() {
-
-		setTitle ("Wanted!");
-		setSize (800, 600);
-
 		// Create Static Labels
 		timerLabel = new JLabel ("Timer");
 		wantedIntel = new JLabel("Wanted");
@@ -268,7 +264,9 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
                 timeInteger--;
                 if (timeInteger <= 5) {
                     timerValue.setForeground(Color.RED);
-                }
+                } else {
+					timerValue.setForeground(Color.BLACK);
+				}
                 timerValue.setText(String.valueOf(timeInteger));
             } else {
                 timer.stop();

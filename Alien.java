@@ -11,8 +11,13 @@ import java.util.Random;
 public class Alien extends Thread {
 
    private JPanel panel;
+
    private int x;
    private int y;
+
+   private int width;
+   private int height;
+
    private int topY;		// regenerated alien drawn at this y coordinate
 
    Ellipse2D.Double head;	// ellipse drawn for face
@@ -27,7 +32,9 @@ public class Alien extends Thread {
 
    Random random;
 
-   public Alien (JPanel p, int xPos, int yPos) {
+   private Bat bat;
+
+   public Alien (JPanel p, int xPos, int yPos, Bat bat) {
       panel = p;
       dimension = panel.getSize();
       backgroundColour = panel.getBackground ();
@@ -35,9 +42,23 @@ public class Alien extends Thread {
       x = xPos;
       y = yPos;
       topY = yPos;
-	
+
+      width = 30;
+      height = 45;
+
+      this.bat = bat;
+
+      random = new Random();
+
       dx = 0;			// no movement along x-axis
       dy = 10;			// would like the alien to drop down
+   }
+
+
+   public void setLocation() {
+      int panelWidth = panel.getWidth();
+      x = random.nextInt (panelWidth - width);
+      y = topY;
    }
 
 
@@ -47,7 +68,7 @@ public class Alien extends Thread {
 
       // Draw the head
 
-      head = new Ellipse2D.Double(x, y, 30, 45);
+      head = new Ellipse2D.Double(x, y, width, height);
 
       g2.setColor(Color.YELLOW); 
       g2.fill(head);		// colour the head
@@ -90,14 +111,21 @@ public class Alien extends Thread {
 
       if (!panel.isVisible ()) return;
 
-      int panelHeight = panel.getHeight();
-
       x = x + dx;
       y = y + dy;
- 
-      if (y > panelHeight)
-	  y = topY;		// regenerate alien at this y-coordinate
 
+      int height = panel.getHeight();
+
+      boolean collision = collidesWithBat();
+
+      if (collision) {
+	  setLocation();		// regenerate alien at top
+      }
+      else
+      if (y > height) {
+	  setLocation();
+	  dy = dy + 1;			// speed up alien when it is re-generated at top
+      }
    }
 
 
@@ -122,6 +150,19 @@ public class Alien extends Thread {
       	  return false;
 
       return head.contains(x, y);
+   }
+
+
+   public Rectangle2D.Double getBoundingRectangle() {
+      return new Rectangle2D.Double (x, y, width, height);
+   }
+
+   
+   public boolean collidesWithBat() {
+      Rectangle2D.Double myRect = getBoundingRectangle();
+      Rectangle2D.Double batRect = bat.getBoundingRectangle();
+      
+      return myRect.intersects(batRect); 
    }
 
 }

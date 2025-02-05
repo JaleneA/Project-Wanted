@@ -1,44 +1,23 @@
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel {
 
-   // Shapes
-   Square square;
-   Diamond diamond;
-   Triangle triangle;
-   Circle circle;
-
-   // Dummy Shapes
-   private Square dummySquare;
-   private Diamond dummyDiamond;
-   private Triangle dummyTriangle;
-   private Circle dummyCircle;
-
    // Info
    private Dimension dimension;
    private int currentLevel;
-   private List<Object> shapesList = new ArrayList<>();
+   private List<Shape> shapesList = new ArrayList<>();
 
    public enum Shapes {
       SQUARE, DIAMOND, CIRCLE, TRIANGLE, NONE
    }
 
    public GamePanel() {
-      // Shapes
-      square = null;
-      diamond = null;
-      triangle = null;
-      circle = null;
-
-      // Dummy Shapes
-      dummySquare = null;
-      dummyDiamond = null;
-      dummyTriangle = null;
-      dummyCircle = null;
    }
 
    public void createGameEntities() {
@@ -58,36 +37,18 @@ public class GamePanel extends JPanel {
  }
 
    public void drawGameEntities(Graphics g) {
-      for (Object shape : shapesList) {
-         if (shape instanceof Square) {
-             ((Square) shape).draw(g);
-         } else if (shape instanceof Diamond) {
-             ((Diamond) shape).draw(g);
-         } else if (shape instanceof Triangle) {
-             ((Triangle) shape).draw(g);
-         } else if (shape instanceof Circle) {
-             ((Circle) shape).draw(g);
-         }
+      for (Shape shape : shapesList) {
+         shape.draw(g);
      }
    }
 
-   public void updateGameEntities(int direction) {
-     
-   }
-
    public Shapes isOnShape(int x, int y) {
-      for (Object shape : shapesList) {
-          if (shape instanceof Square && ((Square) shape).isOnSquare(x, y)) {
-              return Shapes.SQUARE;
-          }
-          if (shape instanceof Diamond && ((Diamond) shape).isOnDiamond(x, y)) {
-              return Shapes.DIAMOND;
-          }
-          if (shape instanceof Circle && ((Circle) shape).isOnCircle(x, y)) {
-              return Shapes.CIRCLE;
-          }
-          if (shape instanceof Triangle && ((Triangle) shape).isOnTriangle(x, y)) {
-              return Shapes.TRIANGLE;
+      for (Shape shape : shapesList) {
+          if (shape.isOn(x, y)) {
+              if (shape instanceof Square) return Shapes.SQUARE;
+              if (shape instanceof Diamond) return Shapes.DIAMOND;
+              if (shape instanceof Circle) return Shapes.CIRCLE;
+              if (shape instanceof Triangle) return Shapes.TRIANGLE;
           }
       }
       return Shapes.NONE;
@@ -98,7 +59,6 @@ public class GamePanel extends JPanel {
       super.paintComponent(g);
       g.setColor(getBackground());
       g.fillRect(0, 0, getWidth(), getHeight());
-
       drawGameEntities(g);
    }
 
@@ -112,159 +72,161 @@ public class GamePanel extends JPanel {
    }
 
    private void levelOne() {
-
       shapesList.clear();
 
-      // Dimension Sizes
-      dimension = this.getSize();
-      int panelW = dimension.width;
-      int panelH = dimension.height;
+      int[] gridInfo = getGridInfo();
+      int panelW = gridInfo[0];
+      int panelH = gridInfo[1];
 
-      // Shape Sizes
-      dummySquare = new Square(this,0, 0);
-      int squareW = dummySquare.getW();
-      int squareH = dummySquare.getH();
+      Map<Shapes, int[]> shapeSizes = getShapeSizes();
 
-      dummyDiamond = new Diamond(this, 0, 0);
-      int diamondW = dummyDiamond.getW();
-      int diamondH = dummyDiamond.getH();
-
-      dummyTriangle = new Triangle(this, 0, 0);
-      int triangleB = dummyTriangle.getB();
-      int triangleH = dummyTriangle.getH();
-
-      dummyCircle = new Circle(this, 0, 0);
-      int circleW = dummyCircle.getW();
-      int circleH = dummyCircle.getH();
-
-      // Positioning Offset
       int offCenter = 50;
 
-      createShape(Shapes.SQUARE, (panelW / 2) - (squareW / 2) + offCenter, (panelH / 2) - (squareH / 2) + offCenter);
-      createShape(Shapes.DIAMOND, (panelW / 2) - (diamondW / 2) + offCenter, (panelH / 2) - (diamondH / 2) - offCenter);
-      createShape(Shapes.TRIANGLE, (panelW / 2) - (triangleB / 2) - offCenter, (panelH / 2) - (triangleH / 2) - offCenter);
-      createShape(Shapes.CIRCLE, (panelW / 2) - (circleW / 2) - offCenter, (panelH / 2) - (circleH / 2) + offCenter);
+      createShape(Shapes.SQUARE, getCenteredX(panelW, shapeSizes, Shapes.SQUARE) + offCenter, getCenteredY(panelH, shapeSizes, Shapes.SQUARE) + offCenter, 0, 0);
+      createShape(Shapes.DIAMOND, getCenteredX(panelW, shapeSizes, Shapes.DIAMOND) + offCenter, getCenteredY(panelH, shapeSizes, Shapes.DIAMOND) - offCenter, 0, 0);
+      createShape(Shapes.TRIANGLE, getCenteredX(panelW, shapeSizes, Shapes.TRIANGLE) - offCenter, getCenteredY(panelH, shapeSizes, Shapes.TRIANGLE) - offCenter, 0, 0);
+      createShape(Shapes.CIRCLE, getCenteredX(panelW, shapeSizes, Shapes.CIRCLE) - offCenter, getCenteredY(panelH, shapeSizes, Shapes.CIRCLE) + offCenter, 0, 0);
 
       repaint();
    }
 
    private void levelTwo() {
-
       shapesList.clear();
 
-      // Dimension Sizes
-      dimension = this.getSize();
-      int panelW = dimension.width;
-      int panelH = dimension.height;
-  
-      // Shape Sizes
-      dummySquare = new Square(this, 0, 0);
-      int shapeW = dummySquare.getW();
-  
-      // Define Grid Size
-      int cellPadding = 5;
-      int cols = (panelW - cellPadding) / (shapeW + cellPadding);
-      int rows = (panelH - cellPadding) / (shapeW + cellPadding);
+      int[] gridInfo = getGridInfo();
+      int panelW = gridInfo[0];
+      int panelH = gridInfo[1];
 
-      Shapes[] shapeTypes = {Shapes.SQUARE, Shapes.DIAMOND, Shapes.TRIANGLE, Shapes.CIRCLE};
+      int cellPadding = 5;
+      int shapeW = new Square(this, 0, 0, 0, 0).getW();
+      int[] gridSize = getGridSize(panelW, panelH, shapeW, cellPadding);
+      int cols = gridSize[0];
+      int rows = gridSize[1];
+
       Shapes wantedShapeType = ShapePanel.getSelectedShape();
-      
-      List<Shapes> unwantedShapes = new ArrayList<>();
-      for (Shapes shape : shapeTypes) {
-         if (shape != wantedShapeType) {
-            unwantedShapes.add(shape);
-         }
-      }
+      List<Shapes> unwantedShapes = getUnwantedShapes(wantedShapeType);
 
       int oddRow = (int) (Math.random() * rows);
       int oddCol = (int) (Math.random() * cols);
 
-      for (int row = 0; row < rows; row++) {
-          for (int col = 0; col < cols; col++) {
-              int x = col * (shapeW + cellPadding) + cellPadding;
-              int y = row * (shapeW + cellPadding) + cellPadding;
-              
-              if (row == oddRow && col == oddCol) {
-                 createShape(wantedShapeType, x, y);
-              } else {
-                  Shapes randomUnwantedShape = unwantedShapes.get((int) (Math.random() * unwantedShapes.size()));
-                  createShape(randomUnwantedShape, x, y);
-              }
-          }
-      }
+      populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, 0, 0);
       repaint();
-  }
+   }
 
    private void levelThree() {
       shapesList.clear();
 
-      int panelWidth = getWidth();
-      int panelHeight = getHeight();
+      int[] gridInfo = getGridInfo();
+      int panelW = gridInfo[0];
+      int panelH = gridInfo[1];
 
-      int shapeWidth = 50; 
-      int shapeHeight = 50;
-      int offsetX = shapeWidth + 10;
-      int offsetY = shapeHeight + 10;
+      int cellPadding = 5;
+      int shapeW = new Square(this, 0, 0, 0, 0).getW();
+      int[] gridSize = getGridSize(panelW, panelH, shapeW, cellPadding);
+      int cols = gridSize[0];
+      int rows = gridSize[1];
 
-      int cols = panelWidth / offsetX;
-      int rows = panelHeight / offsetY;
-
-      Shapes[] shapeTypes = {Shapes.SQUARE, Shapes.DIAMOND, Shapes.TRIANGLE, Shapes.CIRCLE};
       Shapes wantedShapeType = ShapePanel.getSelectedShape();
-      List<Shapes> unwantedShapes = new ArrayList<>();
-      for (Shapes shape : shapeTypes) {
-            if (shape != wantedShapeType) {
-               unwantedShapes.add(shape);
-            }
-      }
+      List<Shapes> unwantedShapes = getUnwantedShapes(wantedShapeType);
 
-      int wantedShapeX = (int) (Math.random() * cols) * offsetX;
-      int wantedShapeY = (int) (Math.random() * rows) * offsetY;
+      int oddRow = (int) (Math.random() * rows);
+      int oddCol = (int) (Math.random() * cols);
 
-      for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-               int x = col * offsetX;
-               int y = row * offsetY;
+      int speedX = 0;
+      int speedY = 2;
 
-               if (x == wantedShapeX && y == wantedShapeY) {
-                  createShape(wantedShapeType, x, y);
-               } else {
-                  Shapes shapeToCreate = unwantedShapes.get((int) (Math.random() * unwantedShapes.size()));
-                  createShape(shapeToCreate, x, y);
-               }
-               for (Object shape : shapesList) {
-                  if (shape instanceof Thread && !((Thread) shape).isAlive()) {
-                        ((Thread) shape).start();
-                  }
-               }
-            }
+      populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, speedX, speedY);
+
+      for (Shape shape : shapesList) {
+         shape.startMovement();
       }
       repaint();
    }
 
-   public void stopAllThreads() {
-      for (Object shape : shapesList) {
-         if (shape instanceof Thread thread) {
-              thread.interrupt();
+   // Helper Methods
+   private void createShape(Shapes type, int x, int y, int speedX, int speedY) {
+      if (type == null) {
+          throw new IllegalArgumentException("Shape type cannot be null");
+      }
+
+      Shape shape = switch (type) {
+         case SQUARE -> new Square(this, x, y, speedX, speedY);
+         case DIAMOND -> new Diamond(this, x, y, speedX, speedY);
+         case TRIANGLE -> new Triangle(this, x, y, speedX, speedY);
+         case CIRCLE -> new Circle(this, x, y, speedX, speedY);
+         case NONE -> throw new UnsupportedOperationException("Unimplemented case: " + type);
+         default -> throw new IllegalArgumentException("Unexpected value: " + type);
+      };
+      shapesList.add(shape);
+  }
+
+   private int[] getGridInfo() {
+      dimension = this.getSize();
+      return new int[]{dimension.width, dimension.height};
+   }
+
+   private int[] getGridSize(int panelW, int panelH, int shapeW, int padding) {
+      int cols = (panelW - padding) / (shapeW + padding);
+      int rows = (panelH - padding) / (shapeW + padding);
+      return new int[]{cols, rows};
+   }
+
+   private List<Shapes> getUnwantedShapes(Shapes wantedShape) {
+      Shapes[] shapeTypes = {Shapes.SQUARE, Shapes.DIAMOND, Shapes.TRIANGLE, Shapes.CIRCLE};
+      List<Shapes> unwantedShapes = new ArrayList<>();
+      for (Shapes shape : shapeTypes) {
+         if (shape != wantedShape) {
+            unwantedShapes.add(shape);
+         }
+      }
+      return unwantedShapes;
+   }
+
+   private void populateGrid(int rows, int cols, int shapeW, int padding, Shapes wantedShape,
+                           List<Shapes> unwantedShapes, int oddRow, int oddCol, int speedX, int speedY) {
+      for (int row = 0; row < rows; row++) {
+         for (int col = 0; col < cols; col++) {
+               int x = col * (shapeW + padding) + padding;
+               int y = row * (shapeW + padding) + padding;
+
+               if (row == oddRow && col == oddCol) {
+                  createShape(wantedShape, x, y, speedX, speedY);
+               } else {
+                  Shapes randomUnwantedShape = unwantedShapes.get((int) (Math.random() * unwantedShapes.size()));
+                  createShape(randomUnwantedShape, x, y, speedX, speedY);
+               }
          }
       }
    }
 
-   private void createShape(Shapes type, int x, int y) {
-      if (type == null) {
-         throw new IllegalArgumentException("Shape type cannot be null");
-     }
+   private Map<Shapes, int[]> getShapeSizes() {
+      Map<Shapes, int[]> shapeSizes = new HashMap<>();
+      shapeSizes.put(Shapes.SQUARE, new int[]{new Square(this, 0, 0, 0, 0).getW(), new Square(this, 0, 0, 0, 0).getH()});
+      shapeSizes.put(Shapes.DIAMOND, new int[]{new Diamond(this, 0, 0, 0, 0).getW(), new Diamond(this, 0, 0, 0, 0).getH()});
+      shapeSizes.put(Shapes.TRIANGLE, new int[]{new Triangle(this, 0, 0, 0, 0).getB(), new Triangle(this, 0, 0, 0, 0).getH()});
+      shapeSizes.put(Shapes.CIRCLE, new int[]{new Circle(this, 0, 0, 0, 0).getW(), new Circle(this, 0, 0, 0, 0).getH()});
+      return shapeSizes;
+   }
 
-      Object shape = switch (type) {
-            case SQUARE -> new Square(this, x, y);
-            case DIAMOND -> new Diamond(this, x, y);
-            case TRIANGLE -> new Triangle(this, x, y);
-            case CIRCLE -> new Circle(this, x, y);
-            default -> throw new IllegalArgumentException("Unexpected value: " + type);
-      };
+   private int getCenteredX(int panelW, Map<Shapes, int[]> shapeSizes, Shapes type) {
+      return (panelW / 2) - (shapeSizes.get(type)[0] / 2);
+  }
 
-      if (shape != null) {
-         shapesList.add(shape);
+   private int getCenteredY(int panelH, Map<Shapes, int[]> shapeSizes, Shapes type) {
+      return (panelH / 2) - (shapeSizes.get(type)[1] / 2);
+   }
+
+   public void stopAllThreads() {
+      for (Shape shape : shapesList) {
+          shape.stopMovement();
       }
+  }
+
+   public void setShapesList(List<Shape> shapesList) {
+      this.shapesList = shapesList;
+   }
+
+   public List<Shape> getShapesList() {
+      return shapesList;
    }
 }

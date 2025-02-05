@@ -1,46 +1,31 @@
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Polygon;
+import java.awt.geom.Rectangle2D;
 import javax.swing.JPanel;
 
-public class Triangle extends Thread {
+public class Triangle extends Shape {
 
-   private JPanel panel;
+    // Attributes
+    private int b, h;
+    boolean isRunning;
+    private Color color;
+    private JPanel panel;
+    private Polygon triangle;
 
-   private int x;
-   private int y;
-
-   private int b;
-   private int h;
-
-   private int dx;
-   private int dy;
-
-   Polygon triangle;
-   boolean isRunning;
-
-   private Color backgroundColour;
-   private Dimension dimension;
-
-   public Triangle(JPanel p, int xPos, int yPos) {
-        panel = p;
-        dimension = panel.getSize();
-        backgroundColour = panel.getBackground ();
-
-        x = xPos;
-        y = yPos;
-
-        dx = 0;
-        dy = 2;
-
-        b = 50;
-        h = 50;
+    // Constructor
+    public Triangle(JPanel panel, int xPos, int yPos, int speedX, int speedY) {
+        super(xPos, yPos, speedX, speedY); // x, y, dx, dy
+        this.panel = panel;
+        this.b = 50;
+        this.h = 50;
+        this.color = Color.GREEN;
     }
 
     // Draw Triangle
+    @Override
     public void draw(Graphics g) {
-        g.setColor(Color.GREEN);
+        g.setColor(color);
         triangle = new Polygon(
             new int[] {x, x + b, x + b / 2},
             new int[] {y + h, y + h, y},
@@ -49,38 +34,33 @@ public class Triangle extends Thread {
         g.fillPolygon(triangle);
     }
 
-    // Is On Triangle
-   public boolean isOnTriangle (int x, int y) {
-    if (triangle == null)
-        return false;
-
-    return triangle.contains(x, y);
-   }
-
     // Erase Triangle
-    public void erase() {
+    private void erase() {
         Graphics g = panel.getGraphics();
-        g.setColor(backgroundColour);
+        g.setColor(panel.getBackground());
         g.fillRect(x, y, b, h);
         g.dispose();
-     }
-
+    }
 
     // Move Triangle
+    @Override
     public void move() {
-        if (!panel.isVisible ()) return;
+        if (!panel.isVisible()) return;
         erase();
-        int panelHeight = panel.getHeight();
 
-        x = x + dx;
-        y = y + dy;
+        x += speedX;
+        y += speedY;
 
-        if (y > panelHeight + 10)
+        if (y > panel.getHeight() + 10)
             y = 0;
+
+        if (x > panel.getWidth() + 10)
+            x = 0;
 
         panel.repaint();
     }
 
+    // Movement
     @Override
     public void run() {
         isRunning = true;
@@ -94,9 +74,50 @@ public class Triangle extends Thread {
         }
     }
 
-    public void stopRunning() {
+    @Override
+    public void startMovement() {
+        new Thread(this).start();
+    }
+
+    @Override
+    public void stopMovement() {
         isRunning = false;
         this.interrupt();
+    }
+
+    // Is On Triangle
+    @Override
+    public boolean isOn(int x, int y) {
+        if (triangle == null)
+            return false;
+        return triangle.contains(x, y);
+    }
+
+    @Override
+    public Rectangle2D.Double getBoundingRectangle() {
+        return new Rectangle2D.Double(x, y, b, h);
+    }
+
+    // Collision
+    @Override
+    public boolean collidesWith(Shape otherShape) {
+        switch (otherShape) {
+            case Square square -> {
+                return getBoundingRectangle().intersects(square.getBoundingRectangle());
+            }
+            case Circle circle -> {
+                return getBoundingRectangle().intersects(circle.getBoundingRectangle());
+            }
+            case Diamond diamond -> {
+                return getBoundingRectangle().intersects(diamond.getBoundingRectangle());
+            }
+            case Triangle triangle1 -> {
+                return getBoundingRectangle().intersects(triangle1.getBoundingRectangle());
+            }
+            default -> {
+            }
+        }
+        return false;
     }
 
     public int getB() {
@@ -106,5 +127,4 @@ public class Triangle extends Thread {
     public int getH() {
         return h;
     }
-
 }

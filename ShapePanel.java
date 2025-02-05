@@ -4,107 +4,57 @@ import java.util.Random;
 import javax.swing.JPanel;
 
 public class ShapePanel extends JPanel {
+    private Shape currentShape;
+    private static GamePanel.Shapes selectedShape;
+    private Dimension dimension;
 
-   // Shapes
-   private Square square;
-   private Diamond diamond;
-   private Triangle triangle;
-   private Circle circle;
+    public ShapePanel() {
+        currentShape = null;
+    }
 
-   // Dummy Shapes
-   private Square dummySquare;
-   private Diamond dummyDiamond;
-   private Triangle dummyTriangle;
-   private Circle dummyCircle;
+    public void pickWantedShape() {
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(GamePanel.Shapes.values().length - 1);
+        selectedShape = GamePanel.Shapes.values()[randomIndex];
 
-   // Info
-   private Dimension dimension;
-   private static GamePanel.Shapes selectedShape;
+        dimension = this.getSize();
+        int panelW = dimension.width;
+        int panelH = dimension.height;
 
-   public ShapePanel() {
-      // Shapes
-      square = null;
-      diamond = null;
-      triangle = null;
-      circle = null;
+        switch (selectedShape) {
+            case SQUARE -> currentShape = new Square(this, (panelW / 2) - 25, (panelH / 2) - 25, 0, 0);
+            case DIAMOND -> currentShape = new Diamond( this, (panelW / 2) - 25, (panelH / 2) - 25, 0, 0);
+            case TRIANGLE -> currentShape = new Triangle(this, (panelW / 2) - 25, (panelH / 2) - 25, 0, 0);
+            case CIRCLE -> currentShape = new Circle(this, (panelW / 2) - 25, (panelH / 2) - 25, 0, 0);
+            default -> throw new IllegalArgumentException("Unexpected Value: " + selectedShape);
+        }
+    }
 
-      // Dummy Shapes
-      dummySquare = null;
-      dummyDiamond = null;
-      dummyTriangle = null;
-      dummyCircle = null;
-   }
+    public void drawWantedShape() {
+        repaint();
+    }
 
-   public void pickWantedShape() {
+    public static void setWantedShape(GamePanel.Shapes shapeSelected) {
+        selectedShape = shapeSelected;
+    }
 
-      // Random Selection
-      Random rand = new Random();
-      int randomIndex = rand.nextInt(GamePanel.Shapes.values().length - 1);
-      selectedShape = GamePanel.Shapes.values()[randomIndex];
+    public static GamePanel.Shapes getSelectedShape() {
+        return selectedShape;
+    }
 
-      // Dimension Sizes
-      dimension = this.getSize();
-      int panelW = dimension.width;
-      int panelH = dimension.height;
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(getBackground());
+        g.fillRect(0, 0, getWidth(), getHeight());
 
-      // Shape Sizes
-      dummySquare = new Square(this,0, 0);
-      int squareW = dummySquare.getW();
-      int squareH = dummySquare.getH();
+        if (currentShape != null) {
+            currentShape.draw(g);
+        }
+    }
 
-      dummyDiamond = new Diamond(this, 0, 0);
-      int diamondW = dummyDiamond.getW();
-      int diamondH = dummyDiamond.getH();
-
-      dummyTriangle = new Triangle(this, 0, 0);
-      int triangleB = dummyTriangle.getB();
-      int triangleH = dummyTriangle.getH();
-
-      dummyCircle = new Circle(this, 0, 0);
-      int circleW = dummyCircle.getW();
-      int circleH = dummyCircle.getH();
-
-      // Selection
-      switch (selectedShape) {
-         case SQUARE -> square = new Square(this, (panelW / 2) - (squareW / 2), (panelH / 2) - (squareH / 2));
-         case DIAMOND -> diamond = new Diamond(this, (panelW / 2) - (diamondW / 2), (panelH / 2) - (diamondH / 2));
-         case TRIANGLE -> triangle = new Triangle(this, (panelW / 2) - (triangleB / 2), (panelH / 2) - (triangleH / 2));
-         case CIRCLE -> circle = new Circle(this, (panelW / 2) - (circleW / 2), (panelH / 2) - (circleH / 2));
-      }
-   }
-
-   public void drawWantedShape() {
-      repaint();
-   }
-
-   public static void setWantedShape(GamePanel.Shapes shapeSelected) {
-      selectedShape = shapeSelected;
-   }
-   public static GamePanel.Shapes getSelectedShape() {
-      return selectedShape;
-  }
-
-   @Override
-   protected void paintComponent(Graphics g) {
-      super.paintComponent(g);
-      g.setColor(getBackground());
-      g.fillRect(0, 0, getWidth(), getHeight());
-
-      if (square != null) square.draw(g);
-      if (diamond != null) diamond.draw(g);
-      if (triangle != null) triangle.draw(g);
-      if (circle != null) circle.draw(g);
-   }
-
-   public void panelEraser() {
-      square = null;
-      diamond = null;
-      triangle = null;
-      circle = null;
-      repaint();
-   }
-
-   public void isOnWantedShape (int x, int y) {
-
-   }
+    public void panelEraser() {
+        currentShape = null;
+        repaint();
+    }
 }

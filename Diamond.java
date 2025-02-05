@@ -1,113 +1,132 @@
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.geom.Rectangle2D;
 import javax.swing.JPanel;
 
-public class Diamond extends Thread{
+public class Diamond extends Shape {
 
-   private JPanel panel;
-
-   private int x;
-   private int y;
-
-   private int w;
-   private int h;
-
-   private int dx;
-   private int dy;
-
-   private Polygon diamond;
+   // Attributes
+   private int w, h;
    boolean isRunning;
+   private Color color;
+   private JPanel panel;
+   private Polygon diamond;
 
-   private double angle = Math.toRadians(45);
-
-   private Color backgroundColour;
-   private Dimension dimension;
-
-   public Diamond (JPanel p, int xPos, int yPos) {
-      panel = p;
-      dimension = panel.getSize();
-      backgroundColour = panel.getBackground ();
-      x = xPos;
-      y = yPos;
-
-      dx = 0;
-      dy = 2;
-
-      w = 50;
-      h = 50;
+   // Constructor
+   public Diamond(JPanel panel, int xPos, int yPos, int speedX, int speedY) {
+      super(xPos, yPos, speedX, speedY);  // x, y, dx, dy
+      this.panel = panel;
+      this.w = 50;
+      this.h = 50;
+      this.color = Color.YELLOW;
    }
 
    // Draw Diamond
+   @Override
    public void draw(Graphics g) {
-      Graphics2D g2 = (Graphics2D) g;
-      g2.setColor(Color.YELLOW);
-
-      double centerX = x + w / 2;
-      double centerY = y + h / 2;
-
-      int[] xPoints = { (int) centerX, (int) (centerX + w / 2), (int) centerX, (int) (centerX - w / 2) };
-      int[] yPoints = { (int) (centerY - h / 2), (int) centerY, (int) (centerY + h / 2), (int) centerY };
-
-      diamond = new Polygon(xPoints, yPoints, 4);
-      g2.fill(diamond);
-   }
-
-   // Is On Diamond
-   public boolean isOnDiamond (int x, int y) {
-      if (diamond == null)
-            return false;
-      return diamond.contains(x, y);
-   }
+   Graphics2D g2 = (Graphics2D) g;
+   double centerX = x + w / 2;
+   double centerY = y + h / 2;
+   int[] xPoints = {(int) centerX, (int) (centerX + w / 2), (int) centerX, (int) (centerX - w / 2)};
+   int[] yPoints = {(int) (centerY - h / 2), (int) centerY, (int) (centerY + h / 2), (int) centerY};
+   diamond = new Polygon(xPoints, yPoints, 4);
+   g2.setColor(color);
+   g2.fill(diamond);
+}
 
    // Erase Diamond
-   public void erase() {
+   private void erase() {
       Graphics g = panel.getGraphics();
-      g.setColor(backgroundColour);
+      g.setColor(panel.getBackground());
       g.fillRect(x, y, w, h);
       g.dispose();
    }
 
    // Move Diamond
+   @Override
    public void move() {
-      if (!panel.isVisible ()) return;
+      if (!panel.isVisible()) return;
       erase();
-      int panelHeight = panel.getHeight();
 
-      x = x + dx;
-      y = y + dy;
+      x += speedX;
+      y += speedY;
 
-      if (y > panelHeight + 10)
+      if (y > panel.getHeight() + 10)
          y = 0;
 
-      panel.repaint();
-   }
+      if (x > panel.getWidth() + 10)
+         x = 0;
 
+      panel.repaint();
+    }
+
+   // Movement
    @Override
    public void run() {
       isRunning = true;
       while (isRunning) {
-            move();
-            try {
+         move();
+         try {
                Thread.sleep(20);
-            } catch (InterruptedException e) {
+         } catch (InterruptedException e) {
                break;
-            }
+         }
       }
    }
 
-   public void stopRunning() {
+   @Override
+   public void startMovement() {
+      new Thread(this).start();
+   }
+
+   @Override
+   public void stopMovement() {
       isRunning = false;
       this.interrupt();
-  }
+   }
 
-    public int getW() {
-        return w;
+   // Is On Diamond
+   @Override
+   public boolean isOn(int x, int y) {
+      if (diamond == null)
+            return false;
+      return diamond.contains(x, y);
+   }
+
+   @Override
+   public Rectangle2D.Double getBoundingRectangle() {
+      return new Rectangle2D.Double(x, y, w, h);
+   }
+
+   // Collision
+   @Override
+   public boolean collidesWith(Shape otherShape) {
+       switch (otherShape) {
+           case Square square -> {
+               return getBoundingRectangle().intersects(square.getBoundingRectangle());
+           }
+           case Circle circle1 -> {
+               return getBoundingRectangle().intersects(circle1.getBoundingRectangle());
+           }
+           case Diamond diamond1 -> {
+               return getBoundingRectangle().intersects(diamond1.getBoundingRectangle());
+           }
+           case Triangle triangle1 -> {
+               return getBoundingRectangle().intersects(triangle1.getBoundingRectangle());
+           }
+           default -> {
+           }
+       }
+       return false;
+   }
+
+   public int getW() {
+      return w;
     }
 
-    public int getH() {
-        return h;
+   public int getH() {
+      return h;
     }
 }
