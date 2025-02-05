@@ -4,7 +4,7 @@ import java.awt.Graphics;
 import java.awt.Polygon;
 import javax.swing.JPanel;
 
-public class Triangle {
+public class Triangle extends Thread {
 
    private JPanel panel;
 
@@ -18,6 +18,7 @@ public class Triangle {
    private int dy;
 
    Polygon triangle;
+   boolean isRunning;
 
    private Color backgroundColour;
    private Dimension dimension;
@@ -31,7 +32,7 @@ public class Triangle {
         y = yPos;
 
         dx = 0;
-        dy = 10;
+        dy = 2;
 
         b = 50;
         h = 50;
@@ -56,16 +57,47 @@ public class Triangle {
     return triangle.contains(x, y);
    }
 
-    // Erase Triangle - Square Code
-    // public void erase () {
-    //     Graphics g = panel.getGraphics ();
-    //     Graphics2D g2 = (Graphics2D) g;
+    // Erase Triangle
+    public void erase() {
+        Graphics g = panel.getGraphics();
+        g.setColor(backgroundColour);
+        g.fillRect(x, y, b, h);
+        g.dispose();
+     }
 
-    //     g2.setColor (backgroundColour);
-    //     g2.fill (new Rectangle2D.Double (x, y, width, height));
 
-    //     g.dispose();
-    // }
+    // Move Triangle
+    public void move() {
+        if (!panel.isVisible ()) return;
+        erase();
+        int panelHeight = panel.getHeight();
+
+        x = x + dx;
+        y = y + dy;
+
+        if (y > panelHeight + 10)
+            y = 0;
+
+        panel.repaint();
+    }
+
+    @Override
+    public void run() {
+        isRunning = true;
+        while (isRunning) {
+            move();
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+    }
+
+    public void stopRunning() {
+        isRunning = false;
+        this.interrupt();
+    }
 
     public int getB() {
         return b;

@@ -45,7 +45,7 @@ public class GamePanel extends JPanel {
       switch (currentLevel) {
          case 1 -> levelOne();
          case 2 -> levelTwo();
-         case 3 -> levelOne();
+         case 3 -> levelThree();
          case 4 -> levelTwo();
          case 5 -> levelOne();
          case 6 -> levelTwo();
@@ -105,6 +105,10 @@ public class GamePanel extends JPanel {
    public void panelEraser() {
       shapesList.clear();
       repaint();
+   }
+
+   public void setLevel(int level) {
+      this.currentLevel = level;
    }
 
    private void levelOne() {
@@ -191,9 +195,62 @@ public class GamePanel extends JPanel {
       repaint();
   }
 
-  // Helper Method
-   private void createShape(Shapes type, int x, int y) {
+   private void levelThree() {
+      shapesList.clear();
 
+      int panelWidth = getWidth();
+      int panelHeight = getHeight();
+
+      int shapeWidth = 50; 
+      int shapeHeight = 50;
+      int offsetX = shapeWidth + 10;
+      int offsetY = shapeHeight + 10;
+
+      int cols = panelWidth / offsetX;
+      int rows = panelHeight / offsetY;
+
+      Shapes[] shapeTypes = {Shapes.SQUARE, Shapes.DIAMOND, Shapes.TRIANGLE, Shapes.CIRCLE};
+      Shapes wantedShapeType = ShapePanel.getSelectedShape();
+      List<Shapes> unwantedShapes = new ArrayList<>();
+      for (Shapes shape : shapeTypes) {
+            if (shape != wantedShapeType) {
+               unwantedShapes.add(shape);
+            }
+      }
+
+      int wantedShapeX = (int) (Math.random() * cols) * offsetX;
+      int wantedShapeY = (int) (Math.random() * rows) * offsetY;
+
+      for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+               int x = col * offsetX;
+               int y = row * offsetY;
+
+               if (x == wantedShapeX && y == wantedShapeY) {
+                  createShape(wantedShapeType, x, y);
+               } else {
+                  Shapes shapeToCreate = unwantedShapes.get((int) (Math.random() * unwantedShapes.size()));
+                  createShape(shapeToCreate, x, y);
+               }
+               for (Object shape : shapesList) {
+                  if (shape instanceof Thread && !((Thread) shape).isAlive()) {
+                        ((Thread) shape).start();
+                  }
+               }
+            }
+      }
+      repaint();
+   }
+
+   public void stopAllThreads() {
+      for (Object shape : shapesList) {
+         if (shape instanceof Thread thread) {
+              thread.interrupt();
+         }
+      }
+   }
+
+   private void createShape(Shapes type, int x, int y) {
       if (type == null) {
          throw new IllegalArgumentException("Shape type cannot be null");
      }
@@ -209,9 +266,5 @@ public class GamePanel extends JPanel {
       if (shape != null) {
          shapesList.add(shape);
       }
-   }
-
-   public void setLevel(int level) {
-      this.currentLevel = level;
    }
 }

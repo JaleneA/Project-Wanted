@@ -197,12 +197,16 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 
 		if (command.equals(playB.getText())) {
 			playB.setEnabled(false);
+
 			levelInteger = levelInteger + 1;
 			gamePanel.setLevel(levelInteger);
 			currentLevel.setText(String.valueOf(levelInteger));
+
 			startTimerCountdown();
+
 			shapePanel.pickWantedShape();
 			gamePanel.createGameEntities();
+
 			gamePanel.repaint();
 			shapePanel.repaint();
 		}
@@ -311,6 +315,10 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 			gamePanel.setLevel(levelInteger);
 			currentLevel.setText(String.valueOf(levelInteger));
 		}
+
+		// Stopping Movement Levels
+		gamePanel.stopAllThreads();
+
 		shapePanel.panelEraser();
 		shapePanel.pickWantedShape();
 		shapePanel.drawWantedShape();

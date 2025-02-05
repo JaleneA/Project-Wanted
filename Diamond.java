@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import javax.swing.JPanel;
 
-public class Diamond {
+public class Diamond extends Thread{
 
    private JPanel panel;
 
@@ -19,6 +19,7 @@ public class Diamond {
    private int dy;
 
    private Polygon diamond;
+   boolean isRunning;
 
    private double angle = Math.toRadians(45);
 
@@ -32,8 +33,8 @@ public class Diamond {
       x = xPos;
       y = yPos;
 
-      dx = 10;
-      dy = 0;
+      dx = 0;
+      dy = 2;
 
       w = 50;
       h = 50;
@@ -60,6 +61,47 @@ public class Diamond {
             return false;
       return diamond.contains(x, y);
    }
+
+   // Erase Diamond
+   public void erase() {
+      Graphics g = panel.getGraphics();
+      g.setColor(backgroundColour);
+      g.fillRect(x, y, w, h);
+      g.dispose();
+   }
+
+   // Move Diamond
+   public void move() {
+      if (!panel.isVisible ()) return;
+      erase();
+      int panelHeight = panel.getHeight();
+
+      x = x + dx;
+      y = y + dy;
+
+      if (y > panelHeight + 10)
+         y = 0;
+
+      panel.repaint();
+   }
+
+   @Override
+   public void run() {
+      isRunning = true;
+      while (isRunning) {
+            move();
+            try {
+               Thread.sleep(20);
+            } catch (InterruptedException e) {
+               break;
+            }
+      }
+   }
+
+   public void stopRunning() {
+      isRunning = false;
+      this.interrupt();
+  }
 
     public int getW() {
         return w;
