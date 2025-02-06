@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel {
@@ -11,6 +12,7 @@ public class GamePanel extends JPanel {
    // Info
    private Dimension dimension;
    private int currentLevel;
+   private Shape wantedShape;
    private List<Shape> shapesList = new ArrayList<>();
 
    public enum Shapes {
@@ -24,17 +26,17 @@ public class GamePanel extends JPanel {
       switch (currentLevel) {
          case 1 -> levelOne();
          case 2 -> levelTwo();
-         case 3 -> levelThree();
-         case 4 -> levelTwo();
-         case 5 -> levelOne();
-         case 6 -> levelTwo();
-         case 7 -> levelOne();
+         case 3 -> movementLevel(0, 1, 0, 1);
+         case 4 -> movementLevel(1, 0, 1, 0);
+         case 5 -> scatterLevel(150, 20); 
+         case 6 -> movementLevel(4, 0, 4, 0);
+         case 7 -> movementLevel(0, 4, 0, 4);
          case 8 -> levelTwo();
          case 9 -> levelOne();
          case 10 -> levelTwo();
          default -> System.out.println("Huh- You're Not Supposed To Be Here! Level: " + currentLevel);
-     }
- }
+      }
+   }
 
    public void drawGameEntities(Graphics g) {
       for (Shape shape : shapesList) {
@@ -43,6 +45,10 @@ public class GamePanel extends JPanel {
    }
 
    public Shapes isOnShape(int x, int y) {
+      if (wantedShape != null && wantedShape.isOn(x, y)) {
+         return ShapePanel.getSelectedShape();
+     }
+
       for (Shape shape : shapesList) {
           if (shape.isOn(x, y)) {
               if (shape instanceof Square) return Shapes.SQUARE;
@@ -60,10 +66,15 @@ public class GamePanel extends JPanel {
       g.setColor(getBackground());
       g.fillRect(0, 0, getWidth(), getHeight());
       drawGameEntities(g);
+
+      if (wantedShape != null) {
+         wantedShape.draw(g);
+     }
    }
 
    public void panelEraser() {
       shapesList.clear();
+      wantedShape = null;
       repaint();
    }
 
@@ -74,7 +85,7 @@ public class GamePanel extends JPanel {
    private void levelOne() {
       shapesList.clear();
 
-      int[] gridInfo = getGridInfo();
+      int[] gridInfo = getPanelInfo();
       int panelW = gridInfo[0];
       int panelH = gridInfo[1];
 
@@ -93,7 +104,7 @@ public class GamePanel extends JPanel {
    private void levelTwo() {
       shapesList.clear();
 
-      int[] gridInfo = getGridInfo();
+      int[] gridInfo = getPanelInfo();
       int panelW = gridInfo[0];
       int panelH = gridInfo[1];
 
@@ -109,14 +120,14 @@ public class GamePanel extends JPanel {
       int oddRow = (int) (Math.random() * rows);
       int oddCol = (int) (Math.random() * cols);
 
-      populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, 0, 0);
+      populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, 0, 0, 0 , 0);
       repaint();
    }
 
-   private void levelThree() {
+   private void movementLevel(int speedX, int speedY, int wantedSpeedX, int wantedSpeedY) {
       shapesList.clear();
 
-      int[] gridInfo = getGridInfo();
+      int[] gridInfo = getPanelInfo();
       int panelW = gridInfo[0];
       int panelH = gridInfo[1];
 
@@ -132,14 +143,30 @@ public class GamePanel extends JPanel {
       int oddRow = (int) (Math.random() * rows);
       int oddCol = (int) (Math.random() * cols);
 
-      int speedX = 0;
-      int speedY = 2;
-
-      populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, speedX, speedY);
+      populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, speedX, speedY, wantedSpeedX, wantedSpeedY);
 
       for (Shape shape : shapesList) {
          shape.startMovement();
       }
+      repaint();
+   }
+
+   private void scatterLevel(int shapeAmount, int distanceVal) {
+      Random rand = new Random();
+      shapesList.clear();
+
+      int[] panelInfo = getPanelInfo();
+      int panelW = panelInfo[0];
+      int panelH = panelInfo[1];
+
+      Shapes wantedShapeType = ShapePanel.getSelectedShape();
+
+      int randX = rand.nextInt(panelW - distanceVal);
+      int randY = rand.nextInt(panelH - distanceVal);
+      createShape(wantedShapeType, randX, randY, 0, 0);
+      wantedShape = shapesList.get(shapesList.size() - 1);
+
+      scatterShapes(panelW, panelH, wantedShapeType, shapeAmount, distanceVal);
       repaint();
    }
 
@@ -160,7 +187,7 @@ public class GamePanel extends JPanel {
       shapesList.add(shape);
   }
 
-   private int[] getGridInfo() {
+   private int[] getPanelInfo() {
       dimension = this.getSize();
       return new int[]{dimension.width, dimension.height};
    }
@@ -183,19 +210,36 @@ public class GamePanel extends JPanel {
    }
 
    private void populateGrid(int rows, int cols, int shapeW, int padding, Shapes wantedShape,
-                           List<Shapes> unwantedShapes, int oddRow, int oddCol, int speedX, int speedY) {
+      List<Shapes> unwantedShapes, int oddRow, int oddCol, int speedX, int speedY, int wantedSpeedX, int wantedSpeedY) {
+
       for (int row = 0; row < rows; row++) {
          for (int col = 0; col < cols; col++) {
-               int x = col * (shapeW + padding) + padding;
-               int y = row * (shapeW + padding) + padding;
+            if (row == oddRow && col == oddCol) {
+                  continue;
+            }
 
-               if (row == oddRow && col == oddCol) {
-                  createShape(wantedShape, x, y, speedX, speedY);
-               } else {
-                  Shapes randomUnwantedShape = unwantedShapes.get((int) (Math.random() * unwantedShapes.size()));
-                  createShape(randomUnwantedShape, x, y, speedX, speedY);
-               }
+            int x = col * (shapeW + padding) + padding;
+            int y = row * (shapeW + padding) + padding;
+
+            Shapes randomUnwantedShape = unwantedShapes.get((int) (Math.random() * unwantedShapes.size()));
+            createShape(randomUnwantedShape, x, y, speedX, speedY);
          }
+      }
+
+      int wantedX = oddCol * (shapeW + padding) + padding;
+      int wantedY = oddRow * (shapeW + padding) + padding;
+      createShape(wantedShape, wantedX, wantedY, wantedSpeedX, wantedSpeedY);
+   }
+
+   private void scatterShapes(int panelW, int panelH, Shapes wantedShapeType, int shapeAmount, int distanceVal) {
+      Random rand = new Random();
+      List<Shapes> unwantedShapes = getUnwantedShapes(wantedShapeType);
+
+      for (int i = 0; i < shapeAmount; i++) {
+         int randX = rand.nextInt(panelW - distanceVal);
+         int randY = rand.nextInt(panelH - distanceVal);
+         Shapes shapeType = unwantedShapes.get(rand.nextInt(unwantedShapes.size()));
+         createShape(shapeType, randX, randY, 0, 0);
       }
    }
 
