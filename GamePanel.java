@@ -1,21 +1,23 @@
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 public class GamePanel extends JPanel {
 
-   // Info
    private Dimension dimension;
    private int currentLevel;
    private Shape wantedShape;
    private List<Shape> shapesList = new ArrayList<>();
+   private Timer flickerTimer;
 
-   public enum Shapes {
+   public static enum Shapes {
       SQUARE, DIAMOND, CIRCLE, TRIANGLE, NONE
    }
 
@@ -25,15 +27,18 @@ public class GamePanel extends JPanel {
    public void createGameEntities() {
       switch (currentLevel) {
          case 1 -> levelOne();
-         case 2 -> levelTwo();
+         case 2 -> gridLevel();
          case 3 -> movementLevel(0, 1, 0, 1);
          case 4 -> movementLevel(1, 0, 1, 0);
          case 5 -> scatterLevel(150, 20); 
          case 6 -> movementLevel(4, 0, 4, 0);
          case 7 -> scatterLevel(200, 15);
          case 8 -> movementLevel(0, 4, 0, 4);
-         case 9 -> levelOne();
-         case 10 -> levelTwo();
+         case 9 -> flickerLevel(true, false, 1000);
+         case 10 -> flickerLevel(true, true, 1000);
+         // mimicLevel()
+         // imposterLevel()
+         // relayLevel()
          default -> System.out.println("Huh- You're Not Supposed To Be Here! Level: " + currentLevel);
       }
    }
@@ -97,12 +102,11 @@ public class GamePanel extends JPanel {
       createShape(Shapes.DIAMOND, getCenteredX(panelW, shapeSizes, Shapes.DIAMOND) + offCenter, getCenteredY(panelH, shapeSizes, Shapes.DIAMOND) - offCenter, 0, 0);
       createShape(Shapes.TRIANGLE, getCenteredX(panelW, shapeSizes, Shapes.TRIANGLE) - offCenter, getCenteredY(panelH, shapeSizes, Shapes.TRIANGLE) - offCenter, 0, 0);
       createShape(Shapes.CIRCLE, getCenteredX(panelW, shapeSizes, Shapes.CIRCLE) - offCenter, getCenteredY(panelH, shapeSizes, Shapes.CIRCLE) + offCenter, 0, 0);
-
       repaint();
    }
 
-   private void levelTwo() {
-      shapesList.clear();
+   private void gridLevel() {
+      resetGrid();
 
       int[] gridInfo = getPanelInfo();
       int panelW = gridInfo[0];
@@ -122,6 +126,11 @@ public class GamePanel extends JPanel {
 
       populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, 0, 0, 0 , 0);
       repaint();
+   }
+
+   private void flickerLevel(boolean isFlicker, boolean isRand, int flickerFreq) {
+      gridLevel();
+      startFlicker(isFlicker, isRand, flickerFreq);
    }
 
    private void movementLevel(int speedX, int speedY, int wantedSpeedX, int wantedSpeedY) {
@@ -241,6 +250,41 @@ public class GamePanel extends JPanel {
          Shapes shapeType = unwantedShapes.get(rand.nextInt(unwantedShapes.size()));
          createShape(shapeType, randX, randY, 0, 0);
       }
+   }
+
+   private void startFlicker(boolean isFlicker, boolean isRand, int flickerFreq) {
+       if (!isFlicker) return;
+
+       if (flickerTimer != null && flickerTimer.isRunning()) {
+           flickerTimer.stop();
+       }
+
+       List<Shape> storedShapes = new ArrayList<>(shapesList);
+
+       flickerTimer = new Timer(flickerFreq, new ActionListener() {
+           private boolean isCleared = false;
+   
+           @Override
+           public void actionPerformed(java.awt.event.ActionEvent e) {
+               if (isCleared) {
+                   if (isRand) {
+                       gridLevel();
+                   } else {
+                       shapesList.addAll(storedShapes);
+                   }
+               } else {
+                   shapesList.clear();
+               }
+               isCleared = !isCleared;
+               repaint();
+           }
+       });
+       flickerTimer.start();
+   }
+
+   private void resetGrid() {
+      shapesList.clear();
+      repaint();
    }
 
    private Map<Shapes, int[]> getShapeSizes() {
