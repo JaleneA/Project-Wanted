@@ -29,13 +29,13 @@ public class GamePanel extends JPanel {
          case 1 -> levelOne();
          case 2 -> gridLevel();
          case 3 -> movementLevel(0, 1, 0, 1);
-         case 4 -> movementLevel(1, 0, 1, 0);
+         case 4 -> flickerLevel(true, false, 1000);
          case 5 -> scatterLevel(150, 20); 
          case 6 -> movementLevel(4, 0, 4, 0);
-         case 7 -> scatterLevel(200, 15);
+         case 7 -> flickerLevel(true, true, 1000);
          case 8 -> movementLevel(0, 4, 0, 4);
-         case 9 -> flickerLevel(true, false, 1000);
-         case 10 -> flickerLevel(true, true, 1000);
+         case 9 -> movementLevel(1, 0, 1, 0);
+         case 10 -> scatterLevel(200, 15);
          // mimicLevel()
          // imposterLevel()
          // relayLevel()
@@ -255,9 +255,7 @@ public class GamePanel extends JPanel {
    private void startFlicker(boolean isFlicker, boolean isRand, int flickerFreq) {
        if (!isFlicker) return;
 
-       if (flickerTimer != null && flickerTimer.isRunning()) {
-           flickerTimer.stop();
-       }
+       stopFlicker();
 
        List<Shape> storedShapes = new ArrayList<>(shapesList);
 
@@ -309,6 +307,12 @@ public class GamePanel extends JPanel {
           shape.stopMovement();
       }
   }
+
+   public void stopFlicker() {
+      if (flickerTimer != null && flickerTimer.isRunning()) {
+         flickerTimer.stop();
+      }
+   }
 
    public void setShapesList(List<Shape> shapesList) {
       this.shapesList = shapesList;
