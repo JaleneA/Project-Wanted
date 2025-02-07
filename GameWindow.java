@@ -2,10 +2,10 @@ import java.awt.*;			// GUI Objects
 import java.awt.event.*;	// Layout Managers
 import javax.swing.*;		// Respond to GUI Events
 
-public class GameWindow extends JFrame implements ActionListener, MouseListener //, KeyListener
+public class GameWindow extends JFrame implements ActionListener, MouseListener
 {
 	// Declare Info
-	private int timeInteger = 10;
+	private int timeInteger = 5;
 	private int scoreInteger = 0;
 	private int levelInteger = 0;
 
@@ -13,6 +13,10 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 	private JLabel timerLabel;
 	private JLabel wantedIntel;
 	private JLabel scoreLabel;
+	private JLabel titleLabel;
+	private JLabel descLabel1;
+	private JLabel descLabel2;
+	private JLabel creditsLabel;
 
 	// Declare Dynamic Labels
 	private JLabel timerValue;
@@ -23,28 +27,57 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 	private JButton playB;
 	private JButton quitB;
 
+	// Declare Managers
 	private Container mainContainer;
 	private Timer timer;
 	private boolean isTimerStopped = false;
+	private boolean gameEnd = false;
+	private boolean gameWon = false;
 
+	// Declare Panels
 	private JPanel mainPanel;
 	private GamePanel gamePanel;
 	private ShapePanel shapePanel;
+
+	private JPanel splashPanel;
 
 	public GameWindow() {
 		// Create Static Labels
 		timerLabel = new JLabel ("Timer");
 		wantedIntel = new JLabel("Wanted");
 		scoreLabel = new JLabel("Score");
+		titleLabel = new JLabel("Wanted!");
+		descLabel1 = new JLabel("It's easy to get lost in a crowd!");
+		descLabel2 = new JLabel("Find the one who disappeared and touch him. There he is!");
+		creditsLabel = new JLabel("Jalene Armstrong • 2025");
 
 		// Decorate Static Labels
 		timerLabel.setFont(new Font("Verdana", Font.PLAIN, 12));
+		timerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		wantedIntel.setFont(new Font("Verdana", Font.PLAIN, 12));
+		wantedIntel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		scoreLabel.setFont(new Font("Verdana", Font.PLAIN, 12));
+		scoreLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		titleLabel.setFont(new Font("Verdana", Font.BOLD, 50));
+		titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		titleLabel.setForeground(Color.WHITE);
+		descLabel1.setFont(new Font("Verdana", Font.PLAIN, 15));
+		descLabel1.setAlignmentX(Component.CENTER_ALIGNMENT);
+		descLabel1.setForeground(Color.WHITE);
+		descLabel2.setFont(new Font("Verdana", Font.PLAIN, 15));
+		descLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
+		descLabel2.setForeground(Color.WHITE);
+		creditsLabel.setFont(new Font("Verdana", Font.PLAIN, 12));
+		creditsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		creditsLabel.setForeground(Color.WHITE);
 
 		// Create Dynamic Labels
 		timerValue = new JLabel(String.valueOf(timeInteger));
+		timerValue.setAlignmentX(Component.CENTER_ALIGNMENT);
+		timerValue.setBackground(Color.WHITE);
 		scoreValue = new JLabel(String.valueOf(scoreInteger));
+		scoreValue.setAlignmentX(Component.CENTER_ALIGNMENT);
+		scoreValue.setBackground(Color.WHITE);
 		currentLevel = new JLabel(String.valueOf(levelInteger));
 
 		// Decorate Dynamic Labels
@@ -84,17 +117,10 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		playB.setFocusPainted(false);
 		quitB.setFocusPainted(false);
 
-		// Add Listener To Each Button
-		playB.addActionListener(this);
-		quitB.addActionListener(this);
-
 		// Create mainPanel
 		mainPanel = new JPanel();
-		FlowLayout flowLayout = new FlowLayout(FlowLayout.CENTER, 0, 0);
-		mainPanel.setLayout(flowLayout);
+		mainPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		mainPanel.setBackground(Color.BLACK);
-
-		GridLayout gridLayout;
 
 		// Create gamePanel
 		gamePanel = new GamePanel();
@@ -102,13 +128,29 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		gamePanel.setPreferredSize(new Dimension(665, 390));
 		gamePanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
 
+		// Create splashPanel
+		splashPanel = new JPanel();
+		splashPanel.add(titleLabel);
+		splashPanel.add(Box.createVerticalStrut(20));
+		splashPanel.add(descLabel1);
+		splashPanel.add(descLabel2);
+		splashPanel.add(Box.createVerticalStrut(120));
+		splashPanel.add(creditsLabel);
+		splashPanel.setBackground(Color.BLACK);
+		splashPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		splashPanel.setLayout(new BoxLayout(splashPanel, BoxLayout.Y_AXIS));
+		splashPanel.setBorder(BorderFactory.createEmptyBorder(75, 0, 0, 0));
+
 		// Create shapePanel
 		shapePanel = new ShapePanel();
 		shapePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		shapePanel.setBackground(Color.WHITE);
+		shapePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		// Create infoPanel
 		JPanel infoPanel = new JPanel();
+		infoPanel.setBackground(Color.BLACK);
+		infoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		infoPanel.setPreferredSize(new Dimension(800, 100));
 		infoPanel.setLayout(new GridLayout(1, 3, 0, 0));
 		infoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
@@ -117,10 +159,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		JPanel timerPanel = new JPanel();
 		timerPanel.add(timerValue);
 		timerPanel.add(timerLabel);
-		timerValue.setBackground(Color.WHITE);
 		timerPanel.setBackground(Color.WHITE);
-		timerValue.setAlignmentX(Component.CENTER_ALIGNMENT);
-		timerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.Y_AXIS));
 		timerPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 30, 0));
 
@@ -131,37 +170,23 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		wantedPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 		wantedPanel.add(wantedIntel);
 		wantedPanel.add(shapePanel);
-		wantedIntel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		shapePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		// create ScorePanel
 		JPanel scorePanel = new JPanel();
 		scorePanel.add(scoreValue);
 		scorePanel.add(scoreLabel);
-		scoreValue.setBackground(Color.WHITE);
 		scorePanel.setBackground(Color.WHITE);
-		scoreLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		scoreValue.setAlignmentX(Component.CENTER_ALIGNMENT);
 		scorePanel.setLayout(new BoxLayout(scorePanel, BoxLayout.Y_AXIS));
 		scorePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 30, 0));
-
-		//create infoPanel
-		infoPanel.add(timerPanel);
-		infoPanel.add(wantedPanel);
-		infoPanel.add(scorePanel);
-		infoPanel.setBackground(Color.BLACK);
-		infoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		// Create buttonPanel
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setBackground(Color.BLACK);
-		gridLayout = new GridLayout(1, 3,90,  0);
-		buttonPanel.setLayout(gridLayout);
+		buttonPanel.setLayout(new GridLayout(1, 3,90,  0));
 		buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
 		// Create levelPanel
 		JPanel levelPanel = new JPanel();
-		levelPanel.add(currentLevel);
 		levelPanel.setBackground(Color.BLACK);
 
 		// Add Buttons To buttonPanel
@@ -169,12 +194,18 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		buttonPanel.add(levelPanel);
 		buttonPanel.add (quitB);
 
+		// Add Panels
+		levelPanel.add(currentLevel);
+		infoPanel.add(timerPanel);
+		infoPanel.add(wantedPanel);
+		infoPanel.add(scorePanel);
+		gamePanel.add(splashPanel);
 		mainPanel.add(infoPanel);
 		mainPanel.add(gamePanel);
 		mainPanel.add(buttonPanel);
 
-		gamePanel.addMouseListener(this);
-		// mainPanel.addKeyListener(this);
+		// Set Up Listeners
+		setupListeners();
 
 		// Add mainPanel To Window Surface
 		mainContainer = getContentPane();
@@ -193,6 +224,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 
 		if (command.equals(playB.getText())) {
 			playB.setEnabled(false);
+			splashPanel.setVisible(false);
 
 			levelInteger = levelInteger + 1;
 			gamePanel.setLevel(levelInteger);
@@ -218,7 +250,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		int y = e.getY();
 
 		GamePanel.Shapes shape = gamePanel.isOnShape(x, y);
-		GamePanel.Shapes selectedShape = shapePanel.getSelectedShape();
+		GamePanel.Shapes selectedShape = ShapePanel.getSelectedShape();
 
 		if (shape != GamePanel.Shapes.NONE) {
 			if (shape == selectedShape) {
@@ -253,22 +285,27 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 	
 	}
 
+	// Method To Set Up Listeners
+	private void setupListeners() {
+        playB.addActionListener(this);
+		quitB.addActionListener(this);
+		gamePanel.addMouseListener(this);
+    }
+
 	// Method To Start Timer Countdown
 	private void startTimerCountdown() {
         if (timer != null && timer.isRunning()) {
             timer.stop();
         }
 
-        timer = new Timer(800, (ActionEvent e) -> {
+        timer = new Timer(1000, (ActionEvent e) -> {
             if (timeInteger > 0 && !isTimerStopped) {
                 timeInteger--;
-                if (timeInteger <= 5) {
-                    timerValue.setForeground(Color.RED);
-                } else {
-					timerValue.setForeground(Color.BLACK);
-				}
                 timerValue.setText(String.valueOf(timeInteger));
             } else {
+				gameEnd = true;
+				displaySplash();
+				playB.setVisible(true);
                 timer.stop();
             }
         });
@@ -293,6 +330,8 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 			wantedIntel.setText("yay :D");
 			levelInteger = levelInteger - 1;
 			currentLevel.setText(String.valueOf(levelInteger));
+			gameWon = true;
+			displaySplash();
 			stopTimer();
 		}
 	}
@@ -323,4 +362,175 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener 
 		gamePanel.panelEraser();
 		gamePanel.createGameEntities();
 	}
+
+	// Method To Update Splash Panel 
+	private void displaySplash() {
+		if (gameEnd) {
+			titleLabel.setText("Times Up!");
+			descLabel1.setText("Oh-No!");
+			descLabel2.setText("He got away! Try to be quicker next time!");
+			creditsLabel.setText("Jalene Armstrong • 2025");
+			playB.setEnabled(true);
+		} else if (gameWon) {
+			titleLabel.setText("Found!");
+			descLabel1.setText("You Did It!");
+			descLabel2.setText("You found them all—nothing can hide from you!");
+			creditsLabel.setText("Jalene Armstrong • 2025");
+			playB.setEnabled(true);
+		}
+		splashPanel.setVisible(true);
+	}
+
+	// Getter & Setter Methods
+    public JLabel getTimerLabel() {
+        return timerLabel;
+    }
+
+    public void setTimerLabel(JLabel timerLabel) {
+        this.timerLabel = timerLabel;
+    }
+
+    public JLabel getWantedIntel() {
+        return wantedIntel;
+    }
+
+    public void setWantedIntel(JLabel wantedIntel) {
+        this.wantedIntel = wantedIntel;
+    }
+
+    public JLabel getScoreLabel() {
+        return scoreLabel;
+    }
+
+    public void setScoreLabel(JLabel scoreLabel) {
+        this.scoreLabel = scoreLabel;
+    }
+
+    public JLabel getTimerValue() {
+        return timerValue;
+    }
+
+    public void setTimerValue(JLabel timerValue) {
+        this.timerValue = timerValue;
+    }
+
+    public JLabel getScoreValue() {
+        return scoreValue;
+    }
+
+    public void setScoreValue(JLabel scoreValue) {
+        this.scoreValue = scoreValue;
+    }
+
+    public JLabel getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public void setCurrentLevel(JLabel currentLevel) {
+        this.currentLevel = currentLevel;
+    }
+
+    public JButton getPlayB() {
+        return playB;
+    }
+
+    public void setPlayB(JButton playB) {
+        this.playB = playB;
+    }
+
+    public JButton getQuitB() {
+        return quitB;
+    }
+
+    public void setQuitB(JButton quitB) {
+        this.quitB = quitB;
+    }
+
+    public Container getMainContainer() {
+        return mainContainer;
+    }
+
+    public void setMainContainer(Container mainContainer) {
+        this.mainContainer = mainContainer;
+    }
+
+    public JPanel getMainPanel() {
+        return mainPanel;
+    }
+
+    public void setMainPanel(JPanel mainPanel) {
+        this.mainPanel = mainPanel;
+    }
+
+    public GamePanel getGamePanel() {
+        return gamePanel;
+    }
+
+    public void setGamePanel(GamePanel gamePanel) {
+        this.gamePanel = gamePanel;
+    }
+
+    public ShapePanel getShapePanel() {
+        return shapePanel;
+    }
+
+    public void setShapePanel(ShapePanel shapePanel) {
+        this.shapePanel = shapePanel;
+    }
+
+    public JLabel getTitleLabel() {
+        return titleLabel;
+    }
+
+    public void setTitleLabel(JLabel titleLabel) {
+        this.titleLabel = titleLabel;
+    }
+
+    public JLabel getDescLabel1() {
+        return descLabel1;
+    }
+
+    public void setDescLabel1(JLabel descLabel) {
+        this.descLabel1 = descLabel;
+    }
+
+	public JLabel getDescLabel2() {
+        return descLabel2;
+    }
+
+    public void setDescLabel2(JLabel descLabel) {
+        this.descLabel2 = descLabel;
+    }
+
+    public JPanel getSplashPanel() {
+        return splashPanel;
+    }
+
+    public void setSplashPanel(JPanel splashPanel) {
+        this.splashPanel = splashPanel;
+    }
+
+    public JLabel getCreditsLabel() {
+        return creditsLabel;
+    }
+
+    public void setCreditsLabel(JLabel creditsLabel) {
+        this.creditsLabel = creditsLabel;
+    }
+
+    public boolean isGameEnd() {
+        return gameEnd;
+    }
+
+    public void setGameEnd(boolean gameEnd) {
+        this.gameEnd = gameEnd;
+    }
+
+    public boolean isGameWon() {
+        return gameWon;
+    }
+
+    public void setGameWon(boolean gameWon) {
+        this.gameWon = gameWon;
+    }
 }

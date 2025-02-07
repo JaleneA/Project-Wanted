@@ -30,8 +30,8 @@ public class GamePanel extends JPanel {
          case 4 -> movementLevel(1, 0, 1, 0);
          case 5 -> scatterLevel(150, 20); 
          case 6 -> movementLevel(4, 0, 4, 0);
-         case 7 -> movementLevel(0, 4, 0, 4);
-         case 8 -> levelTwo();
+         case 7 -> scatterLevel(200, 15);
+         case 8 -> movementLevel(0, 4, 0, 4);
          case 9 -> levelOne();
          case 10 -> levelTwo();
          default -> System.out.println("Huh- You're Not Supposed To Be Here! Level: " + currentLevel);
