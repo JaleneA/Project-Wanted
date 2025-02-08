@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionListener;
@@ -26,18 +27,17 @@ public class GamePanel extends JPanel {
 
    public void createGameEntities() {
       switch (currentLevel) {
-         case 1 -> levelOne();
-         case 2 -> gridLevel();
-         case 3 -> movementLevel(0, 1, 0, 1);
-         case 4 -> flickerLevel(true, false, 1000);
+         case 1 -> mimicLevel(true);
+         case 2 -> mimicLevel(false);
+         case 3 -> motionLevel(0, 1, 0, 1, false);
+         case 4 -> flickerLevel(true, false, 1000, false);
          case 5 -> scatterLevel(150, 20); 
-         case 6 -> movementLevel(4, 0, 4, 0);
-         case 7 -> flickerLevel(true, true, 1000);
-         case 8 -> movementLevel(0, 4, 0, 4);
-         case 9 -> movementLevel(1, 0, 1, 0);
+         case 6 -> motionLevel(4, 0, 4, 0, false);
+         case 7 -> flickerLevel(true, true, 1000, true);
+         case 8 -> motionLevel(0, 4, 0, 4, true);
+         case 9 -> motionLevel(1, 0, 1, 0, true);
          case 10 -> scatterLevel(200, 15);
-         // mimicLevel()
-         // imposterLevel()
+         case 11 -> levelOne();
          // relayLevel()
          default -> System.out.println("Huh- You're Not Supposed To Be Here! Level: " + currentLevel);
       }
@@ -105,35 +105,7 @@ public class GamePanel extends JPanel {
       repaint();
    }
 
-   private void gridLevel() {
-      resetGrid();
-
-      int[] gridInfo = getPanelInfo();
-      int panelW = gridInfo[0];
-      int panelH = gridInfo[1];
-
-      int cellPadding = 5;
-      int shapeW = new Square(this, 0, 0, 0, 0).getW();
-      int[] gridSize = getGridSize(panelW, panelH, shapeW, cellPadding);
-      int cols = gridSize[0];
-      int rows = gridSize[1];
-
-      Shapes wantedShapeType = ShapePanel.getSelectedShape();
-      List<Shapes> unwantedShapes = getUnwantedShapes(wantedShapeType);
-
-      int oddRow = (int) (Math.random() * rows);
-      int oddCol = (int) (Math.random() * cols);
-
-      populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, 0, 0, 0 , 0);
-      repaint();
-   }
-
-   private void flickerLevel(boolean isFlicker, boolean isRand, int flickerFreq) {
-      gridLevel();
-      startFlicker(isFlicker, isRand, flickerFreq);
-   }
-
-   private void movementLevel(int speedX, int speedY, int wantedSpeedX, int wantedSpeedY) {
+   private void motionLevel(int speedX, int speedY, int wantedSpeedX, int wantedSpeedY, boolean mimicColors) {
       shapesList.clear();
 
       int[] gridInfo = getPanelInfo();
@@ -147,12 +119,13 @@ public class GamePanel extends JPanel {
       int rows = gridSize[1];
 
       Shapes wantedShapeType = ShapePanel.getSelectedShape();
+      Color wantedColor = getShapeColor(wantedShapeType);
       List<Shapes> unwantedShapes = getUnwantedShapes(wantedShapeType);
 
       int oddRow = (int) (Math.random() * rows);
       int oddCol = (int) (Math.random() * cols);
 
-      populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, speedX, speedY, wantedSpeedX, wantedSpeedY);
+      populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, speedX, speedY, wantedSpeedX, wantedSpeedY, wantedColor, mimicColors);
 
       for (Shape shape : shapesList) {
          shape.startMovement();
@@ -179,8 +152,38 @@ public class GamePanel extends JPanel {
       repaint();
    }
 
+   private void flickerLevel(boolean isFlicker, boolean isRand, int flickerFreq, boolean mimicColors) {
+      mimicLevel(mimicColors);
+      startFlicker(isFlicker, isRand, flickerFreq, mimicColors);
+   }
+
+   private void mimicLevel(boolean mimicColors) {
+      resetGrid();
+
+      int[] gridInfo = getPanelInfo();
+      int panelW = gridInfo[0];
+      int panelH = gridInfo[1];
+
+      int cellPadding = 5;
+      int shapeW = new Square(this, 0, 0, 0, 0).getW();
+      int[] gridSize = getGridSize(panelW, panelH, shapeW, cellPadding);
+      int cols = gridSize[0];
+      int rows = gridSize[1];
+
+      Shapes wantedShapeType = ShapePanel.getSelectedShape();
+      Color wantedColor = getShapeColor(wantedShapeType);
+
+      List<Shapes> unwantedShapes = getUnwantedShapes(wantedShapeType);
+
+      int oddRow = (int) (Math.random() * rows);
+      int oddCol = (int) (Math.random() * cols);
+
+      populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, 0, 0, 0 , 0, wantedColor, mimicColors);
+      repaint();
+   }
+
    // Helper Methods
-   private void createShape(Shapes type, int x, int y, int speedX, int speedY) {
+   private Shape createShape(Shapes type, int x, int y, int speedX, int speedY) {
       if (type == null) {
           throw new IllegalArgumentException("Shape type cannot be null");
       }
@@ -194,7 +197,18 @@ public class GamePanel extends JPanel {
          default -> throw new IllegalArgumentException("Unexpected value: " + type);
       };
       shapesList.add(shape);
+      return shape;
   }
+
+   private Color getShapeColor(Shapes shapeType) {
+       return switch (shapeType) {
+           case SQUARE -> new Square(this, 0, 0, 0, 0).getColor();
+           case DIAMOND -> new Diamond(this, 0, 0, 0, 0).getColor();
+           case TRIANGLE -> new Triangle(this, 0, 0, 0, 0).getColor();
+           case CIRCLE -> new Circle(this, 0, 0, 0, 0).getColor();
+           default -> Color.BLACK;
+       };
+   }
 
    private int[] getPanelInfo() {
       dimension = this.getSize();
@@ -219,7 +233,8 @@ public class GamePanel extends JPanel {
    }
 
    private void populateGrid(int rows, int cols, int shapeW, int padding, Shapes wantedShape,
-      List<Shapes> unwantedShapes, int oddRow, int oddCol, int speedX, int speedY, int wantedSpeedX, int wantedSpeedY) {
+      List<Shapes> unwantedShapes, int oddRow, int oddCol, int speedX, int speedY,
+      int wantedSpeedX, int wantedSpeedY, Color wantedColor, boolean mimicColors) {
 
       for (int row = 0; row < rows; row++) {
          for (int col = 0; col < cols; col++) {
@@ -231,7 +246,11 @@ public class GamePanel extends JPanel {
             int y = row * (shapeW + padding) + padding;
 
             Shapes randomUnwantedShape = unwantedShapes.get((int) (Math.random() * unwantedShapes.size()));
-            createShape(randomUnwantedShape, x, y, speedX, speedY);
+            Shape shape = createShape(randomUnwantedShape, x, y, speedX, speedY);
+            
+            if (mimicColors) {
+               shape.setColor(wantedColor);
+            }
          }
       }
 
@@ -252,7 +271,7 @@ public class GamePanel extends JPanel {
       }
    }
 
-   private void startFlicker(boolean isFlicker, boolean isRand, int flickerFreq) {
+   private void startFlicker(boolean isFlicker, boolean isRand, int flickerFreq, boolean mimicColors) {
        if (!isFlicker) return;
 
        stopFlicker();
@@ -266,7 +285,7 @@ public class GamePanel extends JPanel {
            public void actionPerformed(java.awt.event.ActionEvent e) {
                if (isCleared) {
                    if (isRand) {
-                       gridLevel();
+                       mimicLevel(mimicColors);
                    } else {
                        shapesList.addAll(storedShapes);
                    }

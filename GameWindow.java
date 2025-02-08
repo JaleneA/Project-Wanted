@@ -303,11 +303,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
                 timeInteger--;
                 timerValue.setText(String.valueOf(timeInteger));
             } else {
-				gamePanel.stopFlicker();
-				gameEnd = true;
-				displaySplash();
-				playB.setVisible(true);
-                timer.stop();
+				timeUp();
             }
         });
 
@@ -322,9 +318,20 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 		}
 	}
 
+	// Method To Times Up!
+	private void timeUp() {
+			shapePanel.panelEraser();
+			gamePanel.stopFlicker();
+			gamePanel.panelEraser();
+			gameEnd = true;
+			playB.setVisible(true);
+			displaySplash();
+			stopTimer();
+	}
+
 	// Method To End Game
 	private void endGame() {
-		if (levelInteger == 11) {
+		if (levelInteger == 12) {
 			// Clear gamePamel
 			shapePanel.panelEraser();
 			gamePanel.panelEraser();
@@ -349,7 +356,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 		scoreValue.setText(String.valueOf(scoreInteger));
 
 		// Next Level
-		if (levelInteger <= 10) {
+		if (levelInteger <= 11) {
 			levelInteger = levelInteger + 1;
 			gamePanel.setLevel(levelInteger);
 			currentLevel.setText(String.valueOf(levelInteger));

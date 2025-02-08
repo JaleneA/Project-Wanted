@@ -127,4 +127,29 @@ public class Triangle extends Shape {
     public int getH() {
         return h;
     }
+
+    public void setB(int b) {
+        this.b = b;
+    }
+
+    public void setH(int h) {
+        this.h = h;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    @Override
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public JPanel getPanel() {
+        return panel;
+    }
+
+    public void setPanel(JPanel panel) {
+        this.panel = panel;
+    }
 }

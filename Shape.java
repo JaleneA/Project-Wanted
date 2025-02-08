@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 
@@ -16,6 +17,7 @@ public abstract class Shape extends Thread {
     public abstract void move();
     public abstract void stopMovement();
     public abstract void startMovement();
+    public abstract void setColor(Color color);
     public abstract void draw(Graphics g);
     public abstract boolean isOn(int x, int y);
     public abstract boolean collidesWith(Shape otherShape);
