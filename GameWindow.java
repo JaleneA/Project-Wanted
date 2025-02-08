@@ -125,7 +125,9 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 		// Create gamePanel
 		gamePanel = new GamePanel();
 		gamePanel.setBackground(Color.BLACK);
-		gamePanel.setPreferredSize(new Dimension(665, 390));
+		Dimension gameDimension = new Dimension(665, 390);
+		gamePanel.setDimension(gameDimension);
+		gamePanel.setPreferredSize(gameDimension);
 		gamePanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
 
 		// Create splashPanel
@@ -322,6 +324,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 	private void timeUp() {
 			shapePanel.panelEraser();
 			gamePanel.stopFlicker();
+			gamePanel.stopAllThreads();
 			gamePanel.panelEraser();
 			gameEnd = true;
 			playB.setVisible(true);
@@ -332,7 +335,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 	// Method To End Game
 	private void endGame() {
 		if (levelInteger == 12) {
-			// Clear gamePamel
+			gamePanel.stopAllThreads();
 			shapePanel.panelEraser();
 			gamePanel.panelEraser();
 			wantedIntel.setText("yay :D");
