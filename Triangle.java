@@ -12,10 +12,11 @@ public class Triangle extends Shape {
     private Color color;
     private JPanel panel;
     private Polygon triangle;
+    private Shape lastCollided = null;
 
     // Constructor
-    public Triangle(JPanel panel, int xPos, int yPos, int speedX, int speedY) {
-        super(xPos, yPos, speedX, speedY); // x, y, dx, dy
+    public Triangle(JPanel panel, int xPos, int yPos, int speedX, int speedY, boolean collisionEnabled) {
+        super(xPos, yPos, speedX, speedY, collisionEnabled); // x, y, dx, dy
         this.panel = panel;
         this.b = 50;
         this.h = 50;
@@ -56,6 +57,23 @@ public class Triangle extends Shape {
 
         if (x > panel.getWidth() + 10)
             x = 0;
+
+        if (panel instanceof GamePanel gamePanel) {
+            Shape currCollided = null;
+
+            for (Shape other : gamePanel.getShapesList()) {
+                if (other != this && collidesWith(other) && this.isCollisionEnabled()) {
+                    currCollided = other;
+                    break;
+                }
+            }
+            if (currCollided != null && currCollided != lastCollided) {
+                swipeColor(currCollided);
+                lastCollided = currCollided;
+            } else if (currCollided == null) {
+                lastCollided = null;
+            }
+        }
 
         panel.repaint();
     }
@@ -136,6 +154,7 @@ public class Triangle extends Shape {
         this.h = h;
     }
 
+    @Override
     public Color getColor() {
         return color;
     }

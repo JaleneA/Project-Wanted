@@ -84,27 +84,27 @@ public class GamePanel extends JPanel {
    }
 
    // Getter & Setter Methods
-    public Dimension getDimension() {
+   public Dimension getDimension() {
         return dimension;
     }
 
-    public void setDimension(Dimension dimension) {
+   public void setDimension(Dimension dimension) {
         this.dimension = dimension;
     }
 
-    public Timer getFlickerTimer() {
+   public Timer getFlickerTimer() {
         return flickerTimer;
     }
 
-    public void setFlickerTimer(Timer flickerTimer) {
+   public void setFlickerTimer(Timer flickerTimer) {
         this.flickerTimer = flickerTimer;
     }
 
-    public Shape getWantedShape() {
+   public Shape getWantedShape() {
         return wantedShape;
     }
 
-    public void setWantedShape(Shape wantedShape) {
+   public void setWantedShape(Shape wantedShape) {
         this.wantedShape = wantedShape;
     }
 

@@ -16,24 +16,23 @@ public class LevelManager {
 
     public void generateLevel(int level) {
         switch (level) {
-            case 1 -> levelOne(); // Easiest
+            case 1 -> easyPeasy(); // Easy Peasy
             case 2 -> mimicLevel(false);
-            case 3 -> motionLevel(0, 1, 0, 1, false);
-            case 4 -> flickerLevel(true, false, 1000, false);
+            case 3 -> relayLevel(0, 1, 0, 1, false, false);
+            case 4 -> flickerLevel(true, false, 500, false);
             case 5 -> scatterLevel(150, 20); 
-            case 6 ->  mimicLevel(true);
-            case 7 -> motionLevel(4, 0, 4, 0, false);
-            case 8 -> motionLevel(0, 4, 0, 4, true);
-            case 9 -> motionLevel(1, 0, 1, 0, true);
+            case 6 -> mimicLevel(true);
+            case 7 -> relayLevel(4, 0, 4, 0, false, true);
+            case 8 -> relayLevel(0, 4, 0, 4, true, true);
+            case 9 -> relayLevel(1, 0, 1, 0, true, false);
             case 10 -> scatterLevel(200, 15);
             case 11 -> flickerLevel(true, true, 1000, true); // Most Difficult
-            // relayLevel()
             default -> System.out.println("Huh- You're Not Supposed To Be Here! Level: " + level);
         }
     }
 
     // Game Levels
-    private void levelOne() {
+    private void easyPeasy() {
         gamePanel.getShapesList().clear();
 
         int[] gridInfo = getPanelInfo();
@@ -42,14 +41,14 @@ public class LevelManager {
         Map<GamePanel.Shapes, int[]> shapeSizes = getShapeSizes();
 
         int offCenter = 50;
-        createShape(GamePanel.Shapes.SQUARE, getCenteredX(panelW, shapeSizes, GamePanel.Shapes.SQUARE) + offCenter, getCenteredY(panelH, shapeSizes, GamePanel.Shapes.SQUARE) + offCenter, 0, 0);
-        createShape(GamePanel.Shapes.DIAMOND, getCenteredX(panelW, shapeSizes, GamePanel.Shapes.DIAMOND) + offCenter, getCenteredY(panelH, shapeSizes, GamePanel.Shapes.DIAMOND) - offCenter, 0, 0);
-        createShape(GamePanel.Shapes.TRIANGLE, getCenteredX(panelW, shapeSizes, GamePanel.Shapes.TRIANGLE) - offCenter, getCenteredY(panelH, shapeSizes, GamePanel.Shapes.TRIANGLE) - offCenter, 0, 0);
-        createShape(GamePanel.Shapes.CIRCLE, getCenteredX(panelW, shapeSizes, GamePanel.Shapes.CIRCLE) - offCenter, getCenteredY(panelH, shapeSizes, GamePanel.Shapes.CIRCLE) + offCenter, 0, 0);
+        createShape(GamePanel.Shapes.SQUARE, getCenteredX(panelW, shapeSizes, GamePanel.Shapes.SQUARE) + offCenter, getCenteredY(panelH, shapeSizes, GamePanel.Shapes.SQUARE) + offCenter, 0, 0, false);
+        createShape(GamePanel.Shapes.DIAMOND, getCenteredX(panelW, shapeSizes, GamePanel.Shapes.DIAMOND) + offCenter, getCenteredY(panelH, shapeSizes, GamePanel.Shapes.DIAMOND) - offCenter, 0, 0, false);
+        createShape(GamePanel.Shapes.TRIANGLE, getCenteredX(panelW, shapeSizes, GamePanel.Shapes.TRIANGLE) - offCenter, getCenteredY(panelH, shapeSizes, GamePanel.Shapes.TRIANGLE) - offCenter, 0, 0, false);
+        createShape(GamePanel.Shapes.CIRCLE, getCenteredX(panelW, shapeSizes, GamePanel.Shapes.CIRCLE) - offCenter, getCenteredY(panelH, shapeSizes, GamePanel.Shapes.CIRCLE) + offCenter, 0, 0, false);
         gamePanel.repaint();
     }
 
-    private void motionLevel(int speedX, int speedY, int wantedSpeedX, int wantedSpeedY, boolean mimicColors) {
+    private void relayLevel(int speedX, int speedY, int wantedSpeedX, int wantedSpeedY, boolean mimicColors, boolean relayEnabled) {
         gamePanel.getShapesList().clear();
 
         int[] gridInfo = getPanelInfo();
@@ -57,7 +56,7 @@ public class LevelManager {
         int panelH = gridInfo[1];
 
         int cellPadding = 5;
-        int shapeW = new Square(gamePanel, 0, 0, 0, 0).getW();
+        int shapeW = new Square(gamePanel, 0, 0, 0, 0, false).getW();
         int[] gridSize = getGridSize(panelW, panelH, shapeW, cellPadding);
         int cols = gridSize[0];
         int rows = gridSize[1];
@@ -68,7 +67,7 @@ public class LevelManager {
 
         int oddRow = (int) (Math.random() * rows);
         int oddCol = (int) (Math.random() * cols);
-        populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, speedX, speedY, wantedSpeedX, wantedSpeedY, wantedColor, mimicColors);
+        populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, speedX, speedY, wantedSpeedX, wantedSpeedY, wantedColor, mimicColors, relayEnabled);
 
         for (Shape shape : gamePanel.getShapesList()) {
            shape.startMovement();
@@ -88,7 +87,7 @@ public class LevelManager {
 
         int randX = rand.nextInt(panelW - distanceVal);
         int randY = rand.nextInt(panelH - distanceVal);
-        createShape(wantedShapeType, randX, randY, 0, 0);
+        createShape(wantedShapeType, randX, randY, 0, 0, false);
         gamePanel.setWantedShape(gamePanel.getShapesList().get(gamePanel.getShapesList().size() - 1));
 
         scatterShapes(panelW, panelH, wantedShapeType, shapeAmount, distanceVal);
@@ -108,7 +107,7 @@ public class LevelManager {
         int panelH = gridInfo[1];
 
         int cellPadding = 5;
-        int shapeW = new Square(gamePanel, 0, 0, 0, 0).getW();
+        int shapeW = new Square(gamePanel, 0, 0, 0, 0, false).getW();
         int[] gridSize = getGridSize(panelW, panelH, shapeW, cellPadding);
         int cols = gridSize[0];
         int rows = gridSize[1];
@@ -120,21 +119,21 @@ public class LevelManager {
 
         int oddRow = (int) (Math.random() * rows);
         int oddCol = (int) (Math.random() * cols);
-        populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, 0, 0, 0 , 0, wantedColor, mimicColors);
+        populateGrid(rows, cols, shapeW, cellPadding, wantedShapeType, unwantedShapes, oddRow, oddCol, 0, 0, 0 , 0, wantedColor, mimicColors, false);
         gamePanel.repaint();
     }
 
     // Level Helpers
-    private Shape createShape(GamePanel.Shapes type, int x, int y, int speedX, int speedY) {
+    private Shape createShape(GamePanel.Shapes type, int x, int y, int speedX, int speedY, boolean collision) {
       if (type == null) {
           throw new IllegalArgumentException("Shape type cannot be null");
     }
 
       Shape shape = switch (type) {
-         case SQUARE -> new Square(gamePanel, x, y, speedX, speedY);
-         case DIAMOND -> new Diamond(gamePanel, x, y, speedX, speedY);
-         case TRIANGLE -> new Triangle(gamePanel, x, y, speedX, speedY);
-         case CIRCLE -> new Circle(gamePanel, x, y, speedX, speedY);
+         case SQUARE -> new Square(gamePanel, x, y, speedX, speedY, collision);
+         case DIAMOND -> new Diamond(gamePanel, x, y, speedX, speedY, collision);
+         case TRIANGLE -> new Triangle(gamePanel, x, y, speedX, speedY, collision);
+         case CIRCLE -> new Circle(gamePanel, x, y, speedX, speedY, collision);
          case NONE -> throw new UnsupportedOperationException("Unimplemented case: " + type);
          default -> throw new IllegalArgumentException("Unexpected value: " + type);
       };
@@ -144,7 +143,7 @@ public class LevelManager {
 
     private void populateGrid(int rows, int cols, int shapeW, int padding, GamePanel.Shapes wantedShape,
         List<GamePanel.Shapes> unwantedShapes, int oddRow, int oddCol, int speedX, int speedY,
-        int wantedSpeedX, int wantedSpeedY, Color wantedColor, boolean mimicColors) {
+        int wantedSpeedX, int wantedSpeedY, Color wantedColor, boolean mimicColors, boolean relayEnabled) {
 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
@@ -156,7 +155,7 @@ public class LevelManager {
                 int y = row * (shapeW + padding) + padding;
 
                 GamePanel.Shapes randomUnwantedShape = unwantedShapes.get((int) (Math.random() * unwantedShapes.size()));
-                Shape shape = createShape(randomUnwantedShape, x, y, speedX, speedY);
+                Shape shape = createShape(randomUnwantedShape, x, y, speedX, speedY, relayEnabled);
                 
                 if (mimicColors) {
                 shape.setColor(wantedColor);
@@ -166,7 +165,7 @@ public class LevelManager {
 
         int wantedX = oddCol * (shapeW + padding) + padding;
         int wantedY = oddRow * (shapeW + padding) + padding;
-        createShape(wantedShape, wantedX, wantedY, wantedSpeedX, wantedSpeedY);
+        createShape(wantedShape, wantedX, wantedY, wantedSpeedX, wantedSpeedY, relayEnabled);
     }
 
     private void scatterShapes(int panelW, int panelH, GamePanel.Shapes wantedShapeType, int shapeAmount, int distanceVal) {
@@ -177,7 +176,7 @@ public class LevelManager {
             int randX = rand.nextInt(panelW - distanceVal);
             int randY = rand.nextInt(panelH - distanceVal);
             GamePanel.Shapes shapeType = unwantedShapes.get(rand.nextInt(unwantedShapes.size()));
-            createShape(shapeType, randX, randY, 0, 0);
+            createShape(shapeType, randX, randY, 0, 0, false);
         }
     }
 
@@ -212,18 +211,18 @@ public class LevelManager {
         gamePanel.repaint();
    }
 
-   private Color getShapeColor(GamePanel.Shapes shapeType) {
-    return switch (shapeType) {
-       case SQUARE -> new Square(gamePanel, 0, 0, 0, 0).getColor();
-       case DIAMOND -> new Diamond(gamePanel, 0, 0, 0, 0).getColor();
-       case TRIANGLE -> new Triangle(gamePanel, 0, 0, 0, 0).getColor();
-       case CIRCLE -> new Circle(gamePanel, 0, 0, 0, 0).getColor();
-       default -> Color.BLACK;
-    };
-}
+    private Color getShapeColor(GamePanel.Shapes shapeType) {
+        return switch (shapeType) {
+        case SQUARE -> new Square(gamePanel, 0, 0, 0, 0, false).getColor();
+        case DIAMOND -> new Diamond(gamePanel, 0, 0, 0, 0, false).getColor();
+        case TRIANGLE -> new Triangle(gamePanel, 0, 0, 0, 0, false).getColor();
+        case CIRCLE -> new Circle(gamePanel, 0, 0, 0, 0, false).getColor();
+        default -> Color.BLACK;
+        };
+    }
 
     private int[] getPanelInfo() {
-    return new int[]{gamePanel.getDimension().width, gamePanel.getDimension().height};
+        return new int[]{gamePanel.getDimension().width, gamePanel.getDimension().height};
     }
 
     private int[] getGridSize(int panelW, int panelH, int shapeW, int padding) {
@@ -245,10 +244,10 @@ public class LevelManager {
 
     private Map<GamePanel.Shapes, int[]> getShapeSizes() {
         Map<GamePanel.Shapes, int[]> shapeSizes = new HashMap<>();
-        shapeSizes.put(GamePanel.Shapes.SQUARE, new int[]{new Square(gamePanel, 0, 0, 0, 0).getW(), new Square(gamePanel, 0, 0, 0, 0).getH()});
-        shapeSizes.put(GamePanel.Shapes.DIAMOND, new int[]{new Diamond(gamePanel, 0, 0, 0, 0).getW(), new Diamond(gamePanel, 0, 0, 0, 0).getH()});
-        shapeSizes.put(GamePanel.Shapes.TRIANGLE, new int[]{new Triangle(gamePanel, 0, 0, 0, 0).getB(), new Triangle(gamePanel, 0, 0, 0, 0).getH()});
-        shapeSizes.put(GamePanel.Shapes.CIRCLE, new int[]{new Circle(gamePanel, 0, 0, 0, 0).getW(), new Circle(gamePanel, 0, 0, 0, 0).getH()});
+        shapeSizes.put(GamePanel.Shapes.SQUARE, new int[]{new Square(gamePanel, 0, 0, 0, 0, false).getW(), new Square(gamePanel, 0, 0, 0, 0, false).getH()});
+        shapeSizes.put(GamePanel.Shapes.DIAMOND, new int[]{new Diamond(gamePanel, 0, 0, 0, 0, false).getW(), new Diamond(gamePanel, 0, 0, 0, 0, false).getH()});
+        shapeSizes.put(GamePanel.Shapes.TRIANGLE, new int[]{new Triangle(gamePanel, 0, 0, 0, 0, false).getB(), new Triangle(gamePanel, 0, 0, 0, 0, false).getH()});
+        shapeSizes.put(GamePanel.Shapes.CIRCLE, new int[]{new Circle(gamePanel, 0, 0, 0, 0, false).getW(), new Circle(gamePanel, 0, 0, 0, 0, false).getH()});
         return shapeSizes;
     }
 

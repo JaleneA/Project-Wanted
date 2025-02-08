@@ -12,10 +12,11 @@ public class Square extends Shape {
     private Color color;
     private JPanel panel;
     private Rectangle2D.Double square;
+    private Shape lastCollided = null;
 
     // Constructor
-    public Square(JPanel panel, int xPos, int yPos, int speedX, int speedY) {
-        super(xPos, yPos, speedX, speedY); // x, y, dx, dy
+    public Square(JPanel panel, int xPos, int yPos, int speedX, int speedY, boolean collisionEnabled) {
+        super(xPos, yPos, speedX, speedY, collisionEnabled); // x, y, dx, dy
         this.panel = panel;
         this.w = 50;
         this.h = 50;
@@ -48,12 +49,6 @@ public class Square extends Shape {
         int newX = x + speedX;
         int newY = y + speedY;
 
-        // for (Shape otherShape : panel.getShapesList()) {
-        //     if (otherShape != this && collidesWith(otherShape)) {
-        //         return;
-        //     }
-        // }
-
         x = newX;
         y = newY;
 
@@ -63,6 +58,22 @@ public class Square extends Shape {
         if (x > panel.getWidth() + 10)
             x = 0;
 
+        if (panel instanceof GamePanel gamePanel) {
+            Shape currCollided = null;
+
+            for (Shape other : gamePanel.getShapesList()) {
+                if (other != this && collidesWith(other) && this.isCollisionEnabled() && other.isCollisionEnabled()) {
+                    currCollided = other;
+                    break;
+                }
+            }
+            if (currCollided != null && currCollided != lastCollided) {
+                swipeColor(currCollided);
+                lastCollided = currCollided;
+            } else if (currCollided == null) {
+                lastCollided = null;
+            }
+        }
         panel.repaint();
     }
 
@@ -142,6 +153,7 @@ public class Square extends Shape {
         this.h = h;
     }
 
+    @Override
     public Color getColor() {
         return color;
     }

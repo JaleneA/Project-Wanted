@@ -13,10 +13,11 @@ public class Diamond extends Shape {
    private Color color;
    private JPanel panel;
    private Polygon diamond;
+   private Shape lastCollided = null;
 
    // Constructor
-   public Diamond(JPanel panel, int xPos, int yPos, int speedX, int speedY) {
-      super(xPos, yPos, speedX, speedY);  // x, y, dx, dy
+   public Diamond(JPanel panel, int xPos, int yPos, int speedX, int speedY, boolean collisionEnabled) {
+      super(xPos, yPos, speedX, speedY, collisionEnabled);  // x, y, dx, dy
       this.panel = panel;
       this.w = 50;
       this.h = 50;
@@ -58,6 +59,23 @@ public class Diamond extends Shape {
 
       if (x > panel.getWidth() + 10)
          x = 0;
+
+      if (panel instanceof GamePanel gamePanel) {
+         Shape currCollided = null;
+
+         for (Shape other : gamePanel.getShapesList()) {
+               if (other != this && collidesWith(other) && this.isCollisionEnabled()) {
+                  currCollided = other;
+                  break;
+               }
+         }
+         if (currCollided != null && currCollided != lastCollided) {
+               swipeColor(currCollided);
+               lastCollided = currCollided;
+         } else if (currCollided == null) {
+               lastCollided = null;
+         }
+      }
 
       panel.repaint();
     }
@@ -138,6 +156,7 @@ public class Diamond extends Shape {
          this.w = w;
    }
 
+   @Override
    public Color getColor() {
       return color;
    }
