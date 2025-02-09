@@ -334,7 +334,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 
 	// Method To End Game
 	private void endGame() {
-		if (levelInteger == 12) {
+		if (levelInteger == 50) {
 			gamePanel.stopAllThreads();
 			shapePanel.panelEraser();
 			gamePanel.panelEraser();
@@ -355,11 +355,11 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 		timerValue.setText(String.valueOf(timeInteger));
 
 		// Score Award
-		scoreInteger = scoreInteger + 100;
+		scoreInteger = scoreInteger + 10;
 		scoreValue.setText(String.valueOf(scoreInteger));
 
 		// Next Level
-		if (levelInteger <= 11) {
+		if (levelInteger <= 50) {
 			levelInteger = levelInteger + 1;
 			gamePanel.setLevel(levelInteger);
 			currentLevel.setText(String.valueOf(levelInteger));

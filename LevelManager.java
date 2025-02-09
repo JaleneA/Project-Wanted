@@ -9,25 +9,70 @@ import javax.swing.Timer;
 
 public class LevelManager {
     private GamePanel gamePanel;
+    private boolean tagFlag;
+
+    private enum Difficulty {
+        EASY, NORMAL, HARD
+    }
 
     public LevelManager(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
+        this.tagFlag = true;
     }
 
     public void generateLevel(int level) {
-        switch (level) {
-            case 1 -> easyPeasy(); // Easy Peasy
-            case 2 -> mimicLevel(false);
-            case 3 -> relayLevel(0, 1, 0, 1, false, false);
-            case 4 -> flickerLevel(true, false, 500, false);
-            case 5 -> scatterLevel(150, 20); 
-            case 6 -> mimicLevel(true);
-            case 7 -> relayLevel(4, 0, 4, 0, false, true);
-            case 8 -> relayLevel(0, 4, 0, 4, true, true);
-            case 9 -> relayLevel(1, 0, 1, 0, true, false);
-            case 10 -> scatterLevel(200, 15);
-            case 11 -> flickerLevel(true, true, 1000, true); // Most Difficult
-            default -> System.out.println("Huh- You're Not Supposed To Be Here! Level: " + level);
+        Difficulty difficulty = (level <= 10) ? Difficulty.EASY : (level <= 25) ? Difficulty.NORMAL : Difficulty.HARD;
+
+        switch (difficulty) {
+            case EASY -> {
+                if (level % 3 == 0) scatterLevel(50, 100); // Divisble By 3: 3, 6, 9
+                else if (level % 2 == 0) mimicLevel(false); // Even Levels: 2, 4, 8, 10
+                else easyPeasy(); // Other Levels: 1, 5, 7
+            }
+            case NORMAL -> {
+                if (level % 4 == 0) { // 12, 16, 20, 24
+                    if (tagFlag) {
+                        motionLevel(1, 0, 1, 0, false, false); // Horizontal : 12, 20
+                    } else {
+                        motionLevel(0, 1, 0, 1, false, false); // Vertical : 16, 24
+                    }
+                }
+                else if (level % 3 == 0) { // 15, 18, 21
+                    if (tagFlag) {
+                        flickerLevel(true, false, 500, false); // No Mimic : 15, 21
+                        tagFlag = !tagFlag; // Tag You're It!
+                    } else {
+                        flickerLevel(true, false, 500, true); // Mimic: 18
+                        tagFlag = !tagFlag; // Tag You're It!
+                    }
+                }
+                else if (level % 2 == 0)
+                    scatterLevel(100, 50); // 14, 22
+
+                else mimicLevel(true); // Other Levels: 11, 13, 17, 19, 23, 25
+            }
+            case HARD -> {
+                if (level % 4 == 0) {
+                    if (tagFlag) {
+                        flickerLevel(true, true, 1000, false); // Rand No Mimic
+                    } else {
+                        flickerLevel(true, true, 1000, true); // Rand & Mimic
+                    }
+                }
+                else if (level % 3 == 0)  {
+                    if (tagFlag) {
+                        motionLevel(2, 2, 2, 2, true, false); // Mimic
+                        tagFlag = !tagFlag;
+                    } else {
+                        motionLevel(2, 2, 2, 2, false, true); // Relay
+                        tagFlag = !tagFlag;
+                    }
+                }
+                else if (level % 2 == 0)
+                    scatterLevel(200, 15);
+
+                else flickerLevel(true, false, 1200, true);
+            }
         }
     }
 
@@ -48,7 +93,7 @@ public class LevelManager {
         gamePanel.repaint();
     }
 
-    private void relayLevel(int speedX, int speedY, int wantedSpeedX, int wantedSpeedY, boolean mimicColors, boolean relayEnabled) {
+    private void motionLevel(int speedX, int speedY, int wantedSpeedX, int wantedSpeedY, boolean mimicColors, boolean relayEnabled) {
         gamePanel.getShapesList().clear();
 
         int[] gridInfo = getPanelInfo();
@@ -156,7 +201,7 @@ public class LevelManager {
 
                 GamePanel.Shapes randomUnwantedShape = unwantedShapes.get((int) (Math.random() * unwantedShapes.size()));
                 Shape shape = createShape(randomUnwantedShape, x, y, speedX, speedY, relayEnabled);
-                
+
                 if (mimicColors) {
                 shape.setColor(wantedColor);
                 }
