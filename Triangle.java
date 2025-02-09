@@ -13,6 +13,7 @@ public class Triangle extends Shape {
     private JPanel panel;
     private Polygon triangle;
     private Shape lastCollided = null;
+    private Thread movementThread;
 
     // Constructor
     public Triangle(JPanel panel, int xPos, int yPos, int speedX, int speedY, boolean collisionEnabled) {
@@ -20,7 +21,7 @@ public class Triangle extends Shape {
         this.panel = panel;
         this.b = 50;
         this.h = 50;
-        this.color = Color.GREEN;
+        this.color = Color.decode("#81C784");
     }
 
     // Draw Triangle
@@ -94,13 +95,18 @@ public class Triangle extends Shape {
 
     @Override
     public void startMovement() {
-        new Thread(this).start();
+        if (movementThread == null || !movementThread.isAlive()) {
+            movementThread = new Thread(this);
+            movementThread.start();
+        }
     }
 
     @Override
     public void stopMovement() {
         isRunning = false;
-        this.interrupt();
+        if (movementThread != null && movementThread.isAlive()) {
+            movementThread.interrupt();
+        }
     }
 
     // Is On Triangle

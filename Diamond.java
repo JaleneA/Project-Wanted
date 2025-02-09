@@ -14,6 +14,7 @@ public class Diamond extends Shape {
    private JPanel panel;
    private Polygon diamond;
    private Shape lastCollided = null;
+   private Thread movementThread;
 
    // Constructor
    public Diamond(JPanel panel, int xPos, int yPos, int speedX, int speedY, boolean collisionEnabled) {
@@ -21,7 +22,7 @@ public class Diamond extends Shape {
       this.panel = panel;
       this.w = 50;
       this.h = 50;
-      this.color = Color.YELLOW;
+      this.color = Color.decode("#FFD54F");
    }
 
    // Draw Diamond
@@ -95,15 +96,20 @@ public class Diamond extends Shape {
    }
 
    @Override
-   public void startMovement() {
-      new Thread(this).start();
-   }
+    public void startMovement() {
+        if (movementThread == null || !movementThread.isAlive()) {
+            movementThread = new Thread(this);
+            movementThread.start();
+        }
+    }
 
-   @Override
-   public void stopMovement() {
-      isRunning = false;
-      this.interrupt();
-   }
+    @Override
+    public void stopMovement() {
+        isRunning = false;
+        if (movementThread != null && movementThread.isAlive()) {
+            movementThread.interrupt();
+        }
+    }
 
    // Is On Diamond
    @Override

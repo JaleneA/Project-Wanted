@@ -323,8 +323,6 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 	// Method To Times Up!
 	private void timeUp() {
 			shapePanel.panelEraser();
-			gamePanel.stopFlicker();
-			gamePanel.stopAllThreads();
 			gamePanel.panelEraser();
 			gameEnd = true;
 			playB.setVisible(true);
@@ -334,14 +332,12 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 
 	// Method To End Game
 	private void endGame() {
-		if (levelInteger == 50) {
-			gamePanel.stopAllThreads();
+		if (levelInteger == 51) {
 			shapePanel.panelEraser();
 			gamePanel.panelEraser();
 			wantedIntel.setText("yay :D");
 			levelInteger = levelInteger - 1;
 			currentLevel.setText(String.valueOf(levelInteger));
-			gamePanel.stopFlicker();
 			gameWon = true;
 			displaySplash();
 			stopTimer();
@@ -351,7 +347,7 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 	// Method To Continue Game
 	private void continueGame() {
 		// Time Award
-		timeInteger = timeInteger + 5;
+		timeInteger = timeInteger + 3;
 		timerValue.setText(String.valueOf(timeInteger));
 
 		// Score Award
@@ -366,13 +362,10 @@ public class GameWindow extends JFrame implements ActionListener, MouseListener
 		}
 
 		// Stopping Movement Levels
-		gamePanel.stopFlicker();
-		gamePanel.stopAllThreads();
-
+		gamePanel.panelEraser();
 		shapePanel.panelEraser();
 		shapePanel.pickWantedShape();
 		shapePanel.drawWantedShape();
-		gamePanel.panelEraser();
 		gamePanel.createGameEntities();
 	}
 

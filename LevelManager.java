@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,10 +10,10 @@ import javax.swing.Timer;
 
 public class LevelManager {
     private GamePanel gamePanel;
-    private boolean tagFlag;
+    private boolean tagFlag = true; // Tag You're It!
 
     private enum Difficulty {
-        EASY, NORMAL, HARD
+        EASY, NORMAL, HARD, FREEFORALL
     }
 
     public LevelManager(GamePanel gamePanel) {
@@ -21,57 +22,67 @@ public class LevelManager {
     }
 
     public void generateLevel(int level) {
-        Difficulty difficulty = (level <= 10) ? Difficulty.EASY : (level <= 25) ? Difficulty.NORMAL : Difficulty.HARD;
+        Difficulty difficulty = (level <= 10) ? Difficulty.EASY 
+                   : (level <= 20) ? Difficulty.NORMAL 
+                   : (level <= 30) ? Difficulty.HARD 
+                   : Difficulty.FREEFORALL;
 
         switch (difficulty) {
             case EASY -> {
-                if (level % 3 == 0) scatterLevel(50, 100); // Divisble By 3: 3, 6, 9
-                else if (level % 2 == 0) mimicLevel(false); // Even Levels: 2, 4, 8, 10
-                else easyPeasy(); // Other Levels: 1, 5, 7
+                if (level % 3 == 0) scatterLevel(50, 100);
+                else if (level % 2 == 0) mimicLevel(false);
+                else easyPeasy();
             }
             case NORMAL -> {
-                if (level % 4 == 0) { // 12, 16, 20, 24
+                if (level % 4 == 0) {
+                    if (tagFlag) motionLevel(1, 0, 1, 0, false, false); 
+                    else motionLevel(0, 1, 0, 1, false, false);
+                }
+                else if (level % 3 == 0) {
                     if (tagFlag) {
-                        motionLevel(1, 0, 1, 0, false, false); // Horizontal : 12, 20
-                    } else {
-                        motionLevel(0, 1, 0, 1, false, false); // Vertical : 16, 24
+                        flickerLevel(true, false, 1000, false);
+                        tagFlag = !tagFlag;
+                    }
+                    else {
+                        flickerLevel(true, false, 1000, true);
+                        tagFlag = !tagFlag;
                     }
                 }
-                else if (level % 3 == 0) { // 15, 18, 21
-                    if (tagFlag) {
-                        flickerLevel(true, false, 500, false); // No Mimic : 15, 21
-                        tagFlag = !tagFlag; // Tag You're It!
-                    } else {
-                        flickerLevel(true, false, 500, true); // Mimic: 18
-                        tagFlag = !tagFlag; // Tag You're It!
-                    }
-                }
-                else if (level % 2 == 0)
-                    scatterLevel(100, 50); // 14, 22
-
-                else mimicLevel(true); // Other Levels: 11, 13, 17, 19, 23, 25
+                else if (level % 2 == 0) scatterLevel(100, 50);
+                else mimicLevel(true);
             }
             case HARD -> {
                 if (level % 4 == 0) {
                     if (tagFlag) {
-                        flickerLevel(true, true, 1000, false); // Rand No Mimic
-                    } else {
-                        flickerLevel(true, true, 1000, true); // Rand & Mimic
+                        flickerLevel(true, true, 1500, false);
+                        tagFlag = !tagFlag;
+                    }
+                    else { flickerLevel(true, true, 1500, true);
+                        tagFlag = !tagFlag;
                     }
                 }
                 else if (level % 3 == 0)  {
-                    if (tagFlag) {
-                        motionLevel(2, 2, 2, 2, true, false); // Mimic
-                        tagFlag = !tagFlag;
-                    } else {
-                        motionLevel(2, 2, 2, 2, false, true); // Relay
-                        tagFlag = !tagFlag;
-                    }
+                    if (tagFlag) motionLevel(2, 2, 2, 2, false, true);
+                    else motionLevel(2, 2, 2, 2, true, false);
                 }
-                else if (level % 2 == 0)
-                    scatterLevel(200, 15);
-
-                else flickerLevel(true, false, 1200, true);
+                else if (level % 2 == 0) flickerLevel(true, false, 1500, true);
+                else scatterLevel(200, 15);
+            }
+            case FREEFORALL -> {
+            Random rand = new Random();
+            List<Runnable> freeForAllLevels = Arrays.asList(
+                () -> scatterLevel(200, 10),
+                () -> flickerLevel(true, true, 1200, false),
+                () -> flickerLevel(true, true, 1200, true),
+                () -> motionLevel(2, 0, 2, 0, true, false),
+                () -> motionLevel(0, 2, 0, 2, true, false),
+                () -> motionLevel(0, 2, 0, 2, false, true),
+                () -> motionLevel(2, 0, 2, 0, false, true),
+                () -> mimicLevel(true),
+                () -> mimicLevel(false),
+                () -> easyPeasy()
+            );
+            freeForAllLevels.get(rand.nextInt(freeForAllLevels.size())).run();
             }
         }
     }

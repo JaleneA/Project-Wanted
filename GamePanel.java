@@ -62,6 +62,8 @@ public class GamePanel extends JPanel {
    }
 
    public void panelEraser() {
+      stopAllThreads();
+      stopFlicker();
       shapesList.clear();
       wantedShape = null;
       repaint();

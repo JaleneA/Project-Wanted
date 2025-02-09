@@ -13,6 +13,7 @@ public class Square extends Shape {
     private JPanel panel;
     private Rectangle2D.Double square;
     private Shape lastCollided = null;
+    private Thread movementThread;
 
     // Constructor
     public Square(JPanel panel, int xPos, int yPos, int speedX, int speedY, boolean collisionEnabled) {
@@ -20,7 +21,7 @@ public class Square extends Shape {
         this.panel = panel;
         this.w = 50;
         this.h = 50;
-        this.color = Color.RED;
+        this.color = Color.decode("#E57373");
     }
 
     // Draw Square
@@ -93,13 +94,18 @@ public class Square extends Shape {
 
     @Override
     public void startMovement() {
-        new Thread(this).start();
+        if (movementThread == null || !movementThread.isAlive()) {
+            movementThread = new Thread(this);
+            movementThread.start();
+        }
     }
 
     @Override
     public void stopMovement() {
         isRunning = false;
-        this.interrupt();
+        if (movementThread != null && movementThread.isAlive()) {
+            movementThread.interrupt();
+        }
     }
 
     // Is On Square

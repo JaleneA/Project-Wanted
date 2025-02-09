@@ -14,6 +14,7 @@ public class Circle extends Shape {
     private JPanel panel;
     private Ellipse2D.Double circle;
     private Shape lastCollided = null;
+    private Thread movementThread;
 
     // Constructor
     public Circle(JPanel panel, int xPos, int yPos, int speedX, int speedY, boolean collisionEnabled) {
@@ -21,7 +22,7 @@ public class Circle extends Shape {
         this.panel = panel;
         this.w = 50;
         this.h = 50;
-        this.color = Color.BLUE;
+        this.color = Color.decode("#64B5F6");
     }
 
     // Draw Circle
@@ -91,13 +92,18 @@ public class Circle extends Shape {
 
     @Override
     public void startMovement() {
-        new Thread(this).start();
+        if (movementThread == null || !movementThread.isAlive()) {
+            movementThread = new Thread(this);
+            movementThread.start();
+        }
     }
 
     @Override
     public void stopMovement() {
         isRunning = false;
-        this.interrupt();
+        if (movementThread != null && movementThread.isAlive()) {
+            movementThread.interrupt();
+        }
     }
 
     // Is On Circle
