@@ -2,7 +2,6 @@ import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -94,7 +93,7 @@ public class LevelManager {
         int[] gridInfo = getPanelInfo();
         int panelW = gridInfo[0];
         int panelH = gridInfo[1];
-        Map<GamePanel.Shapes, int[]> shapeSizes = getShapeSizes();
+        Map<GamePanel.Shapes, int[]> shapeSizes = ShapeFactory.getShapeSizes();
 
         int offCenter = 50;
         createShape(GamePanel.Shapes.SQUARE, getCenteredX(panelW, shapeSizes, GamePanel.Shapes.SQUARE) + offCenter, getCenteredY(panelH, shapeSizes, GamePanel.Shapes.SQUARE) + offCenter, 0, 0, false);
@@ -112,13 +111,13 @@ public class LevelManager {
         int panelH = gridInfo[1];
 
         int cellPadding = 5;
-        int shapeW = new Square(gamePanel, 0, 0, 0, 0, false).getW();
+        int shapeW = 50;
         int[] gridSize = getGridSize(panelW, panelH, shapeW, cellPadding);
         int cols = gridSize[0];
         int rows = gridSize[1];
 
         GamePanel.Shapes wantedShapeType = ShapePanel.getSelectedShape();
-        Color wantedColor = getShapeColor(wantedShapeType);
+        Color wantedColor = ShapeFactory.getShapeColor(wantedShapeType);
         List<GamePanel.Shapes> unwantedShapes = getUnwantedShapes(wantedShapeType);
 
         int oddRow = (int) (Math.random() * rows);
@@ -163,13 +162,13 @@ public class LevelManager {
         int panelH = gridInfo[1];
 
         int cellPadding = 5;
-        int shapeW = new Square(gamePanel, 0, 0, 0, 0, false).getW();
+        int shapeW = 50;
         int[] gridSize = getGridSize(panelW, panelH, shapeW, cellPadding);
         int cols = gridSize[0];
         int rows = gridSize[1];
 
         GamePanel.Shapes wantedShapeType = ShapePanel.getSelectedShape();
-        Color wantedColor = getShapeColor(wantedShapeType);
+        Color wantedColor = ShapeFactory.getShapeColor(wantedShapeType);
 
         List<GamePanel.Shapes> unwantedShapes = getUnwantedShapes(wantedShapeType);
 
@@ -185,14 +184,7 @@ public class LevelManager {
           throw new IllegalArgumentException("Shape type cannot be null");
     }
 
-      Shape shape = switch (type) {
-         case SQUARE -> new Square(gamePanel, x, y, speedX, speedY, collision);
-         case DIAMOND -> new Diamond(gamePanel, x, y, speedX, speedY, collision);
-         case TRIANGLE -> new Triangle(gamePanel, x, y, speedX, speedY, collision);
-         case CIRCLE -> new Circle(gamePanel, x, y, speedX, speedY, collision);
-         case NONE -> throw new UnsupportedOperationException("Unimplemented case: " + type);
-         default -> throw new IllegalArgumentException("Unexpected value: " + type);
-      };
+      Shape shape = ShapeFactory.createShape(type, gamePanel, x, y, speedX, speedY, collision);
       gamePanel.getShapesList().add(shape);
       return shape;
   }
@@ -267,16 +259,6 @@ public class LevelManager {
         gamePanel.repaint();
    }
 
-    private Color getShapeColor(GamePanel.Shapes shapeType) {
-        return switch (shapeType) {
-        case SQUARE -> new Square(gamePanel, 0, 0, 0, 0, false).getColor();
-        case DIAMOND -> new Diamond(gamePanel, 0, 0, 0, 0, false).getColor();
-        case TRIANGLE -> new Triangle(gamePanel, 0, 0, 0, 0, false).getColor();
-        case CIRCLE -> new Circle(gamePanel, 0, 0, 0, 0, false).getColor();
-        default -> Color.BLACK;
-        };
-    }
-
     private int[] getPanelInfo() {
         return new int[]{gamePanel.getDimension().width, gamePanel.getDimension().height};
     }
@@ -296,15 +278,6 @@ public class LevelManager {
             }
         }
         return unwantedShapes;
-    }
-
-    private Map<GamePanel.Shapes, int[]> getShapeSizes() {
-        Map<GamePanel.Shapes, int[]> shapeSizes = new HashMap<>();
-        shapeSizes.put(GamePanel.Shapes.SQUARE, new int[]{new Square(gamePanel, 0, 0, 0, 0, false).getW(), new Square(gamePanel, 0, 0, 0, 0, false).getH()});
-        shapeSizes.put(GamePanel.Shapes.DIAMOND, new int[]{new Diamond(gamePanel, 0, 0, 0, 0, false).getW(), new Diamond(gamePanel, 0, 0, 0, 0, false).getH()});
-        shapeSizes.put(GamePanel.Shapes.TRIANGLE, new int[]{new Triangle(gamePanel, 0, 0, 0, 0, false).getB(), new Triangle(gamePanel, 0, 0, 0, 0, false).getH()});
-        shapeSizes.put(GamePanel.Shapes.CIRCLE, new int[]{new Circle(gamePanel, 0, 0, 0, 0, false).getW(), new Circle(gamePanel, 0, 0, 0, 0, false).getH()});
-        return shapeSizes;
     }
 
     private int getCenteredX(int panelW, Map<GamePanel.Shapes, int[]> shapeSizes, GamePanel.Shapes type) {

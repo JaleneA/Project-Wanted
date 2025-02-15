@@ -47,10 +47,7 @@ public class GamePanel extends JPanel {
 
       for (Shape shape : shapesList) {
           if (shape.isOn(x, y)) {
-              if (shape instanceof Square) return Shapes.SQUARE;
-              if (shape instanceof Diamond) return Shapes.DIAMOND;
-              if (shape instanceof Circle) return Shapes.CIRCLE;
-              if (shape instanceof Triangle) return Shapes.TRIANGLE;
+            return ShapeFactory.getShapeType(shape);
           }
       }
       return Shapes.NONE;

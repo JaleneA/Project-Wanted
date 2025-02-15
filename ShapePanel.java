@@ -26,14 +26,7 @@ public class ShapePanel extends JPanel {
         dimension = this.getSize();
         int panelW = dimension.width;
         int panelH = dimension.height;
-
-        switch (selectedShape) {
-            case SQUARE -> currentShape = new Square(this, (panelW / 2) - 25, (panelH / 2) - 25, 0, 0, false);
-            case DIAMOND -> currentShape = new Diamond( this, (panelW / 2) - 25, (panelH / 2) - 25, 0, 0, false);
-            case TRIANGLE -> currentShape = new Triangle(this, (panelW / 2) - 25, (panelH / 2) - 25, 0, 0, false);
-            case CIRCLE -> currentShape = new Circle(this, (panelW / 2) - 25, (panelH / 2) - 25, 0, 0, false);
-            default -> throw new IllegalArgumentException("Unexpected Value: " + selectedShape);
-        }
+        currentShape = ShapeFactory.createShape(selectedShape, this, (panelW / 2) - 25, (panelH / 2) - 25, 0, 0, false);
     }
 
     public void drawWantedShape() {
