@@ -1,3 +1,8 @@
+/**
+ * @author Jalene Armstrong
+ * @date 2025-02-15
+ */
+
 import java.awt.*;			// GUI Objects
 import java.awt.event.*;	// Layout Managers
 import javax.swing.*;		// Respond to GUI Events

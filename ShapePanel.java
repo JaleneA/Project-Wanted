@@ -1,3 +1,8 @@
+/**
+ * @author Jalene Armstrong
+ * @date 2025-02-15
+ */
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;

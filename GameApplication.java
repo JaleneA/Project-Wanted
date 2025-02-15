@@ -1,3 +1,8 @@
+/**
+ * @author Jalene Armstrong
+ * @date 2025-02-15
+ */
+
 import javax.swing.*;
 
 public class GameApplication
