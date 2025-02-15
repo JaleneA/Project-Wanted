@@ -1,241 +1,217 @@
-import javax.swing.*;			// need this for GUI objects
-import java.awt.*;			// need this for Layout Managers
-import java.awt.event.*;		// need this to respond to GUI events
-	
-public class GameWindow extends JFrame 
-				implements ActionListener,
-					   KeyListener,
-					   MouseListener
+import java.awt.*;			// GUI Objects
+import java.awt.event.*;	// Layout Managers
+import javax.swing.*;		// Respond to GUI Events
+
+public class GameWindow extends JFrame implements ActionListener, MouseListener
 {
-	// declare instance variables for user interface objects
+	// Game Managers
+	private Timer timer;
+	private boolean gameLost = false;
+	private boolean gameWon = false;
+	private final Container mainContainer;
+	private boolean isTimerStopped = false;
 
-	// declare labels 
+	// Panels
+	private final ShapePanel shapePanel = new ShapePanel();
+	private final TimerPanel timerPanel = new TimerPanel();
+	private final ScorePanel scorePanel = new ScorePanel();
+	private final WantedPanel wantedPanel = new WantedPanel(shapePanel);
+	private final InfoPanel infoPanel = new InfoPanel(timerPanel, wantedPanel, scorePanel);
 
-	private JLabel statusBarL;
-	private JLabel keyL;
-	private JLabel mouseL;
+	private final SplashPanel splashPanel = new SplashPanel();
+	private final GamePanel gamePanel = new GamePanel(splashPanel);
+	private final LevelPanel levelPanel = new LevelPanel();
+	private final ButtonPanel buttonPanel = new ButtonPanel(levelPanel);
+	private final MainPanel mainPanel = new MainPanel(infoPanel, gamePanel, buttonPanel);
 
-	// declare text fields
-
-	private JTextField statusBarTF;
-	private JTextField keyTF;
-	private JTextField mouseTF;
-
-	// declare buttons
-
-	private JButton startB;
-	private JButton pauseB;
-	private JButton focusB;
-	private JButton exitB;
-
-	private Container c;
-
-	private JPanel mainPanel;
-	private GamePanel gamePanel;
-
-	@SuppressWarnings({"unchecked"})
 	public GameWindow() {
- 
-		setTitle ("A Game with a Bat and an Alien");
-		setSize (500, 550);
+		// Set Up Listeners
+		setupListeners();
 
-		// create user interface objects
+		// Add mainPanel To Window Surface
+		mainContainer = getContentPane();
+		mainContainer.add(mainPanel);
 
-		// create labels
-
-		statusBarL = new JLabel ("Application Status: ");
-		keyL = new JLabel("Key Pressed: ");
-		mouseL = new JLabel("Location of Mouse Click: ");
-
-		// create text fields and set their colour, etc.
-
-		statusBarTF = new JTextField (25);
-		keyTF = new JTextField (25);
-		mouseTF = new JTextField (25);
-
-		statusBarTF.setEditable(false);
-		keyTF.setEditable(false);
-		mouseTF.setEditable(false);
-
-		statusBarTF.setBackground(Color.CYAN);
-		keyTF.setBackground(Color.YELLOW);
-		mouseTF.setBackground(Color.GREEN);
-
-		// create buttons
-
-		startB = new JButton ("Show Bat");
-	        pauseB = new JButton ("Drop Alien");
-	        focusB = new JButton ("Focus on Key");
-		exitB = new JButton ("Exit");
-
-		// add listener to each button (same as the current object)
-
-		startB.addActionListener(this);
-		pauseB.addActionListener(this);
-		focusB.addActionListener(this);
-		exitB.addActionListener(this);
-
-		
-		// create mainPanel
-
-		mainPanel = new JPanel();
-		FlowLayout flowLayout = new FlowLayout();
-		mainPanel.setLayout(flowLayout);
-
-		GridLayout gridLayout;
-
-		// create the gamePanel for game entities
-
-		gamePanel = new GamePanel();
-        	gamePanel.setPreferredSize(new Dimension(400, 400));
-		gamePanel.createGameEntities();
-
-
-		// create infoPanel
-
-		JPanel infoPanel = new JPanel();
-		gridLayout = new GridLayout(3, 2);
-		infoPanel.setLayout(gridLayout);
-		infoPanel.setBackground(Color.ORANGE);
-
-		// add user interface objects to infoPanel
-	
-		infoPanel.add (statusBarL);
-		infoPanel.add (statusBarTF);
-
-		infoPanel.add (keyL);
-		infoPanel.add (keyTF);		
-
-		infoPanel.add (mouseL);
-		infoPanel.add (mouseTF);
-
-		
-		// create buttonPanel
-
-		JPanel buttonPanel = new JPanel();
-		gridLayout = new GridLayout(1, 4);
-		buttonPanel.setLayout(gridLayout);
-
-		// add buttons to buttonPanel
-
-		buttonPanel.add (startB);
-		buttonPanel.add (pauseB);
-		buttonPanel.add (focusB);
-		buttonPanel.add (exitB);
-
-		// add sub-panels with GUI objects to mainPanel and set its colour
-
-		mainPanel.add(infoPanel);
-		mainPanel.add(gamePanel);
-		mainPanel.add(buttonPanel);
-		mainPanel.setBackground(Color.PINK);
-
-		// set up mainPanel to respond to keyboard and mouse
-
-		gamePanel.addMouseListener(this);
-		mainPanel.addKeyListener(this);
-
-		// add mainPanel to window surface
-
-		c = getContentPane();
-		c.add(mainPanel);
-
-		// set properties of window
-
+		// Window Properties
 		setResizable(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		setVisible(true);
-
-		// set status bar message
-
-		statusBarTF.setText("Application started.");
 	}
 
-
-	// implement single method in ActionListener interface
-
+	// ActionListener Interface
+	@Override
 	public void actionPerformed(ActionEvent e) {
-
 		String command = e.getActionCommand();
-		
-		statusBarTF.setText(command + " button clicked.");
 
-		if (command.equals(focusB.getText()))
-			mainPanel.requestFocus();
+		if (command.equals(buttonPanel.getPlayB().getText())) {
+			if (gameLost || gameWon) {
+				resetGame();
+				buttonPanel.getPlayB().setEnabled(false);
+			}
 
-		if (command.equals(startB.getText()))
-			gamePanel.drawGameEntities();
+			buttonPanel.getPlayB().setEnabled(false);
+			splashPanel.setVisible(false);
 
-		if (command.equals(pauseB.getText()))
-			gamePanel.dropAlien();
+			levelPanel.setLevelInteger(levelPanel.getLevelInteger() + 1);
+			gamePanel.setLevel(levelPanel.getLevelInteger());
 
-		if (command.equals(exitB.getText()))
+			startTimerCountdown();
+
+			shapePanel.pickWantedShape();
+			gamePanel.createGameEntities();
+
+			gamePanel.repaint();
+			shapePanel.repaint();
+		}
+
+		if (command.equals(buttonPanel.getQuitB().getText()))
 			System.exit(0);
 	}
 
-
-	// implement methods in KeyListener interface
-
-	public void keyPressed(KeyEvent e) {
-		int keyCode = e.getKeyCode();
-		String keyText = e.getKeyText(keyCode);
-		keyTF.setText(keyText + " pressed.");
-
-		if (keyCode == KeyEvent.VK_RIGHT) {
-			gamePanel.updateGameEntities(2);
-			gamePanel.drawGameEntities();
-		}
-
-		if (keyCode == KeyEvent.VK_LEFT) {
-			gamePanel.updateGameEntities(1);
-			gamePanel.drawGameEntities();
-		}
-	}
-
-	public void keyReleased(KeyEvent e) {
-
-	}
-
-	public void keyTyped(KeyEvent e) {
-
-	}
-
-	// implement methods in MouseListener interface
-
+	// MouseListener Interface
+	@Override
 	public void mouseClicked(MouseEvent e) {
-
 		int x = e.getX();
 		int y = e.getY();
 
-		if (gamePanel.isOnBat(x, y)) {
-			statusBarTF.setText ("Mouse click on bat!");
-			statusBarTF.setBackground(Color.RED);
-		}
-		else {
-			statusBarTF.setText ("");
-			statusBarTF.setBackground(Color.CYAN);
-		}
+		GamePanel.Shapes shape = gamePanel.isOnShape(x, y);
+		GamePanel.Shapes selectedShape = ShapePanel.getSelectedShape();
 
-		mouseTF.setText("(" + x +", " + y + ")");
-
+		if (shape != GamePanel.Shapes.NONE) {
+			if (shape == selectedShape) {
+				continueGame();
+				winGame();
+			}
+			else {
+				// Time Consequence
+				timerPanel.setTimeInteger(timerPanel.getTimeInteger() - 5);
+			}
+		}
 	}
 
-
+	@Override
 	public void mouseEntered(MouseEvent e) {
 	
 	}
 
+	@Override
 	public void mouseExited(MouseEvent e) {
 	
 	}
 
+	@Override
 	public void mousePressed(MouseEvent e) {
 	
 	}
 
+	@Override
 	public void mouseReleased(MouseEvent e) {
 	
 	}
 
+	// Method To Set Up Listeners
+	private void setupListeners() {
+        buttonPanel.getPlayB().addActionListener(this);
+		buttonPanel.getQuitB().addActionListener(this);
+		gamePanel.addMouseListener(this);
+    }
+
+	// Method To Start Timer Countdown
+	private void startTimerCountdown() {
+        if (timer != null && timer.isRunning()) {
+            timer.stop();
+        }
+
+        timer = new Timer(1000, (ActionEvent e) -> {
+            if (timerPanel.getTimeInteger() > 0 && !isTimerStopped && !gameLost) {
+                timerPanel.setTimeInteger(timerPanel.getTimeInteger() - 1);
+            } else {
+				timeUp();
+            }
+        });
+
+        timer.start();
+    }
+
+	// Method To Stop Timer Countdown
+	private void stopTimer() {
+		isTimerStopped = true;
+		if (timer != null) {
+			timer.stop();
+		}
+	}
+
+	// Method To Times Up!
+	private void timeUp() {
+			shapePanel.panelEraser();
+			gamePanel.panelEraser();
+			gameLost = true;
+			buttonPanel.getPlayB().setVisible(true);
+			displaySplash();
+			stopTimer();
+	}
+
+	// Method To Win Game
+	private void winGame() {
+		if (levelPanel.getLevelInteger() == 51) {
+			shapePanel.panelEraser();
+			gamePanel.panelEraser();
+			levelPanel.setLevelInteger(levelPanel.getLevelInteger() - 1);
+			gameWon = true;
+			displaySplash();
+			stopTimer();
+		}
+	}
+
+	// Method To Continue Game
+	private void continueGame() {
+		// Time Award
+		timerPanel.setTimeInteger(timerPanel.getTimeInteger() + 3);
+
+		// Score Award
+		scorePanel.setScoreInteger(scorePanel.getScoreInteger() + 10);
+
+		// Next Level
+		if (levelPanel.getLevelInteger() <= 50) {
+			levelPanel.setLevelInteger(levelPanel.getLevelInteger() + 1);
+			gamePanel.setLevel(levelPanel.getLevelInteger());
+		}
+
+		// Stopping Movement Levels
+		gamePanel.panelEraser();
+		shapePanel.panelEraser();
+		shapePanel.pickWantedShape();
+		shapePanel.drawWantedShape();
+		gamePanel.createGameEntities();
+	}
+
+	// Method To Update Splash Panel 
+	private void displaySplash() {
+		if (gameLost) {
+			splashPanel.getTitleLabel().setText("Times Up!");
+			splashPanel.getDescLabel1().setText("Oh-No!");
+			splashPanel.getDescLabel2().setText("He got away! Try to be quicker next time!");
+			splashPanel.getCreditsLabel().setText("Jalene Armstrong • 2025");
+			buttonPanel.getPlayB().setEnabled(true);
+		} else if (gameWon) {
+			splashPanel.getTitleLabel().setText("Found!");
+			splashPanel.getDescLabel1().setText("You Did It!");
+			splashPanel.getDescLabel2().setText("You found them all—nothing can hide from you!");
+			splashPanel.getCreditsLabel().setText("Jalene Armstrong • 2025");
+			buttonPanel.getPlayB().setEnabled(true);
+		}
+		splashPanel.setVisible(true);
+	}
+
+	// Method To Restart Game
+	private void resetGame() {
+		splashPanel.setVisible(false);
+		isTimerStopped = false;
+		gameLost = false;
+		gameWon = false;
+		startTimerCountdown();
+		timerPanel.setTimeInteger(5);
+		scorePanel.setScoreInteger(0);
+		levelPanel.setLevelInteger(0);
+	}
 }
