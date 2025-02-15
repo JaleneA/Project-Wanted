@@ -123,23 +123,7 @@ public class Circle extends Shape {
     // Collision
     @Override
     public boolean collidesWith(Shape otherShape) {
-        switch (otherShape) {
-            case Square square -> {
-                return getBoundingRectangle().intersects(square.getBoundingRectangle());
-            }
-            case Circle circle1 -> {
-                return getBoundingRectangle().intersects(circle1.getBoundingRectangle());
-            }
-            case Diamond diamond -> {
-                return getBoundingRectangle().intersects(diamond.getBoundingRectangle());
-            }
-            case Triangle triangle1 -> {
-                return getBoundingRectangle().intersects(triangle1.getBoundingRectangle());
-            }
-            default -> {
-            }
-        }
-        return false;
+        return getBoundingRectangle().intersects(otherShape.getBoundingRectangle());
     }
 
     public int getW() {

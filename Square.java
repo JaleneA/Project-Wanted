@@ -124,23 +124,7 @@ public class Square extends Shape {
     // Collision
     @Override
     public boolean collidesWith(Shape otherShape) {
-        switch (otherShape) {
-            case Square square1 -> {
-                return getBoundingRectangle().intersects(square1.getBoundingRectangle());
-            }
-            case Circle circle -> {
-                return getBoundingRectangle().intersects(circle.getBoundingRectangle());
-            }
-            case Diamond diamond -> {
-                return getBoundingRectangle().intersects(diamond.getBoundingRectangle());
-            }
-            case Triangle triangle -> {
-                return getBoundingRectangle().intersects(triangle.getBoundingRectangle());
-            }
-            default -> {
-            }
-        }
-        return false;
+        return getBoundingRectangle().intersects(otherShape.getBoundingRectangle());
     }
 
     public int getW() {

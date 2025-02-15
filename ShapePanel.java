@@ -1,4 +1,7 @@
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.util.Random;
 import javax.swing.JPanel;
@@ -10,6 +13,9 @@ public class ShapePanel extends JPanel {
 
     public ShapePanel() {
         currentShape = null;
+		this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		this.setBackground(Color.WHITE);
+		this.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
     public void pickWantedShape() {

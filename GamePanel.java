@@ -1,7 +1,9 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -19,8 +21,13 @@ public class GamePanel extends JPanel {
       SQUARE, DIAMOND, CIRCLE, TRIANGLE, NONE
    }
 
-   public GamePanel() {
+   public GamePanel(SplashPanel splashPanel) {
+		this.setBackground(Color.BLACK);
+		this.setDimension(new Dimension(665, 390));
+		this.setPreferredSize(new Dimension(665, 390));
+		this.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
       levelManager = new LevelManager(this);
+      this.add(splashPanel);
    }
 
    public void createGameEntities() {
@@ -90,7 +97,7 @@ public class GamePanel extends JPanel {
         return dimension;
     }
 
-   public void setDimension(Dimension dimension) {
+   private void setDimension(Dimension dimension) {
         this.dimension = dimension;
     }
 
